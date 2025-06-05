@@ -22,6 +22,6 @@ return new class extends Migration
     }
     public function down(): void
     {
-        Schema::dropIfExists('create_categoreies_table');
+        Schema::dropIfExists('categories'); // Corrected table name
     }
 };

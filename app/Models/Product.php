@@ -6,73 +6,27 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\ProductAttributeValue;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class Product extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'category_id',
-        'brand_id',
-        'name',
-        'slug',
-        'sku',
-        'description', 
-        'long_description', 
-        'short_description', 
-        'price',
-        'sale_price', 
-        'quantity', 
-        'thumbnail_url',
-        'images', 
-        'is_visible',
-        'is_new',
-        'is_featured',
-        'on_sale', 
-        'barcode',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
-        'screen_size',     // Например, 15.6 (число)
-        'resolution',      // Например, '1920x1080' (строка)
-        'matrix_type',     // Например, 'IPS' (строка)
-        'refresh_rate',    // Например, 144 (число)
-        'response_time',   // Например, 1 (число)
-        'ram_size',        // Например, 16 (число, ГБ подразумевается)
-        'cpu_type',        // Например, 'Intel Core i7' (строка)
-        'ssd_volume',      // Например, 512 (число, ГБ подразумевается)
-        'gpu_type',        // Например, 'NVIDIA RTX 3060' (строка)
-        'os_type',         // Например, 'Windows 11' или 'Android' (строка)
-        'appliance_type',
-        'chair_material',
-        'chair_mechanism',
-        'table_adjustment',
-        'network_device_type',
-        'security_system_type',
-        'specifications', // JSON для прочих характеристик
-        // Поля ниже были в вашем $fillable, но не ясно, нужны ли они, если есть более конкретные:
-        // 'screen_resolution', // Есть 'resolution'
-        // 'screen_matrix_type',// Есть 'matrix_type'
-        // 'laptop_os',         // Есть 'os_type'
-        // 'laptop_purpose',
-        // 'storage_type',      // Можно определить по наличию ssd_volume/hdd_volume
+        'name', 'slug', 'short_description', 'description', 'long_description',
+        'price', 'sale_price', 'quantity', 'sku', 'barcode',
+        'is_visible', 'is_new', 'is_featured', 'on_sale',
+        'thumbnail_url', 'images', 'category_id', 'brand_id',
+        'meta_title', 'meta_description', 'meta_keywords',
     ];
 
     protected $casts = [
-        'is_visible' => 'boolean',
-        'is_new' => 'boolean',
-        'is_featured' => 'boolean',
-        'on_sale' => 'boolean',
-        'images' => 'array',
-        'specifications' => 'array',
-        'price' => 'float',
-        'sale_price' => 'float', // Было 'old_price', но 'sale_price' логичнее для цены со скидкой
-        'quantity' => 'integer', // Было 'stock'
-        'refresh_rate' => 'integer',
-        'response_time' => 'integer',
-        'screen_size' => 'float', // Если храните как число
-        'ram_size' => 'integer',  // Если храните как число
-        'ssd_volume' => 'integer', // Если храните как число
+        'images' => 'json',
+        'is_visible' => 'boolean', 'is_new' => 'boolean', 'is_featured' => 'boolean', 'on_sale' => 'boolean',
+        'price' => 'decimal:2', 'sale_price' => 'decimal:2',
     ];
 
     public function category(): BelongsTo
@@ -87,29 +41,86 @@ class Product extends Model
 
     public function reviews(): HasMany
     {
-        return $this->hasMany(Review::class)->latest();
+        return $this->hasMany(Review::class); // Ensure Review model and table exist
     }
 
-    public function isInStock(): bool
+    public function attributeValues(): HasMany
     {
-        return $this->quantity > 0; // Используем 'quantity'
+        return $this->hasMany(ProductAttributeValue::class);
     }
 
-    // Аксессор для получения цены с учетом скидки (если нужно)
-    public function getCurrentPriceAttribute(): float
+    public function MappedAttributes(): BelongsToMany
     {
-        if ($this->on_sale && $this->sale_price !== null && $this->sale_price < $this->price) {
-            return $this->sale_price;
+        return $this->belongsToMany(Attribute::class, 'product_attribute_values')
+            ->withPivot([
+                'id as pav_id', 'text_value', 'integer_value', 'decimal_value',
+                'boolean_value', 'date_value', 'datetime_value'
+            ])
+            ->using(ProductAttributeValue::class)
+            ->withTimestamps();
+    }
+
+    public function getProductAttributeValueBySlug(string $attributeSlug)
+    {
+        if (!$this->relationLoaded('MappedAttributes')) {
+            $this->load('MappedAttributes');
         }
-        return $this->price;
+        $attributeModel = $this->MappedAttributes->firstWhere('slug', $attributeSlug);
+        if (!$attributeModel || !is_object($attributeModel)) {
+            Log::debug("Product::getProductAttributeValueBySlug - Product ID {$this->id}: Attribute '{$attributeSlug}' not found or not object.", ['found_attribute' => $attributeModel]);
+            return null;
+        }
+        if ($attributeModel->pivot) {
+            $pivotInstance = $attributeModel->pivot;
+            if ($pivotInstance instanceof ProductAttributeValue) {
+                $pivotInstance->setRelation('attributeDefinition', $attributeModel);
+                return $pivotInstance->value;
+            }
+        }
+        return null;
     }
 
-    // Если у вас было поле old_price для отображения старой цены, когда товар on_sale
-    // public function getDisplayOldPriceAttribute(): ?float
-    // {
-    //     if ($this->on_sale && $this->sale_price !== null && $this->sale_price < $this->price) {
-    //         return $this->price;
-    //     }
-    //     return null;
-    // }
+    public function getDisplayableAttributes(): Collection
+    {
+        $displayable = [];
+        if (!$this->relationLoaded('MappedAttributes')) $this->load('MappedAttributes');
+        if ($this->category && !$this->category->relationLoaded('attributes')) {
+            $this->category->loadMissing('attributes');
+        } elseif (!$this->relationLoaded('category.attributes') && $this->category_id) {
+            $this->loadMissing('category.attributes');
+        }
+
+        $categoryAttributeSortOrders = [];
+        if ($this->category && $this->category->relationLoaded('attributes')) {
+            foreach ($this->category->attributes as $catAttr) {
+                if (!($catAttr instanceof Attribute)) {
+                    Log::error("Product::getDisplayableAttributes - Product ID {$this->id}: \$catAttr in category loop is not Attribute object.", ['type' => gettype($catAttr), 'value' => $catAttr]);
+                    continue;
+                }
+                $categoryAttributeSortOrders[$catAttr->id] = $catAttr->pivot->sort_order ?? 999;
+            }
+        }
+
+        foreach ($this->MappedAttributes as $attributeModel) {
+            if (!($attributeModel instanceof Attribute)) {
+                Log::error("Product::getDisplayableAttributes - Product ID {$this->id}: \$attributeModel in MappedAttributes loop is not Attribute object.", ['type' => gettype($attributeModel), 'value' => $attributeModel]);
+                continue;
+            }
+            $pivotInstance = $attributeModel->pivot;
+            if ($pivotInstance instanceof ProductAttributeValue) {
+                $pivotInstance->setRelation('attributeDefinition', $attributeModel);
+                $value = $pivotInstance->value;
+                if ($value !== null && (is_string($value) ? trim($value) !== '' : true)) {
+                    $displayable[] = (object) [
+                        'id' => $attributeModel->id, 'name' => $attributeModel->name, 'slug' => $attributeModel->slug,
+                        'value' => $value, 'unit' => $attributeModel->unit, 'type' => $attributeModel->type,
+                        'sort_order' => $categoryAttributeSortOrders[$attributeModel->id] ?? 999,
+                    ];
+                }
+            } elseif($pivotInstance) {
+                Log::warning("Product::getDisplayableAttributes - Product ID {$this->id}: Pivot for '{$attributeModel->name}' is not ProductAttributeValue. Type: " . get_class($pivotInstance));
+            }
+        }
+        return collect($displayable)->sortBy('sort_order');
+    }
 }

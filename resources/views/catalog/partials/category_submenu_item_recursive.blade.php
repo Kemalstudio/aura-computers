@@ -1,78 +1,84 @@
 @props([
-'categoryItem',
-'selectedCategorySlug',
-'allSpecificFilterKeys',
-'level' => 0,
-'categoryNameMapping' => []
+    'categoryItem',
+    'selectedCategorySlug',
+    'allSpecificFilterKeys', // Renamed from allDynamicFilterKeys to match usage
+    'keysToClearOnNavigateOrReset', // Added this
+    'level' => 0,
+    'categoryNameMapping' => [],
+    'categoryIconMapping' => [],
+    'defaultCategoryIconPath' => ''
 ])
 
 @php
-$displayName = $categoryNameMapping[$categoryItem->slug] ?? $categoryItem->name;
-// Убедитесь, что $categoryItem->children загружены в контроллере
-$subcategoriesToDisplayCollection = $categoryItem->children ?? collect([]);
-$hasChildren = $subcategoriesToDisplayCollection->isNotEmpty();
+    $displayName = $categoryNameMapping[$categoryItem->slug] ?? $categoryItem->name;
+    $subcategoriesToDisplayCollection = $categoryItem->children()->where('is_visible', true)->orderBy('sort_order')->orderBy('name')->get() ?? collect([]);
+    $hasChildren = $subcategoriesToDisplayCollection->isNotEmpty();
 
-$isActiveParent = isset($selectedCategorySlug) && $selectedCategorySlug == $categoryItem->slug;
-$isChildActive = false;
-if ($hasChildren && isset($selectedCategorySlug)) {
-$checkActiveDescendant = function ($children, $slugToCheck) use (&$checkActiveDescendant, &$isChildActive) {
-foreach ($children as $child) {
-if ($child->slug == $slugToCheck) {
-$isChildActive = true;
-return;
-}
-// Важно: проверяем, что $child->children существует и не пуст перед рекурсивным вызовом
-if (isset($child->children) && $child->children instanceof \Illuminate\Support\Collection && $child->children->isNotEmpty()) {
-$checkActiveDescendant($child->children, $slugToCheck);
-if ($isChildActive) return;
-}
-}
-};
-$checkActiveDescendant($subcategoriesToDisplayCollection, $selectedCategorySlug);
-}
+    $isActiveCategory = isset($selectedCategorySlug) && $selectedCategorySlug == $categoryItem->slug;
 
-$linkClass = 'list-group-item-action d-flex justify-content-between align-items-center category-link';
-if ($level > 0) {
-$linkClass = 'list-group-item-action subcategory-link d-flex justify-content-between align-items-center';
-}
-$currentLinkIsActive = $isActiveParent && !$isChildActive;
-if ($level > 0 && isset($selectedCategorySlug) && $selectedCategorySlug == $categoryItem->slug) {
-$currentLinkIsActive = true;
-}
+    $isParentOfActive = false;
+    if ($hasChildren && isset($selectedCategorySlug)) {
+        $checkActiveDescendant = function ($children, $slugToCheck) use (&$checkActiveDescendant, &$isParentOfActive) {
+            foreach ($children as $child) {
+                if ($child->slug == $slugToCheck) {
+                    $isParentOfActive = true;
+                    return;
+                }
+                if (isset($child->children) && $child->children->isNotEmpty()) {
+                    $checkActiveDescendant($child->children, $slugToCheck);
+                    if ($isParentOfActive) return;
+                }
+            }
+        };
+        $checkActiveDescendant($subcategoriesToDisplayCollection, $selectedCategorySlug);
+    }
+
+    $linkClass = 'list-group-item-action d-flex align-items-center category-link';
+    if ($isActiveCategory) {
+        $linkClass .= ' active';
+    } elseif ($isParentOfActive) {
+        $linkClass .= ' active-parent';
+    }
+
+    $iconUrl = $categoryItem->full_icon_url ?? ($categoryIconMapping[$categoryItem->slug] ?? $defaultCategoryIconPath);
+    $currentParamsToKeep = request()->except(array_merge(['category', 'page'], $allSpecificFilterKeys, $keysToClearOnNavigateOrReset));
 @endphp
 
 <li class="list-group-item {{ $hasChildren ? 'has-submenu' : '' }}">
-    <a href="{{ route('catalog.index', array_merge(request()->except(array_merge(['page', 'brands', 'min_price', 'max_price', 'availability', 'is_new'], $allSpecificFilterKeys)), ['category' => $categoryItem->slug])) }}"
-        class="{{ $linkClass }} {{ $currentLinkIsActive ? 'active' : '' }}"
-        style="padding-left: {{ 0.75 + ($level * 0.8) }}rem;"> {{-- Отступ для визуальной иерархии --}}
-        <span>{{ $displayName }}</span>
+    <a href="{{ route('catalog.index', array_merge($currentParamsToKeep, ['category' => $categoryItem->slug, 'page' => 1])) }}"
+       class="{{ $linkClass }}"
+       style="padding-left: {{ 0.75 + ($level * 0.8) }}rem;">
+        <img src="{{ $iconUrl }}" alt="" class="category-icon me-2">
+        <span class="category-text flex-grow-1">{{ $displayName }}</span>
         @if($hasChildren)
-        <i class="bi bi-chevron-right submenu-indicator"></i>
+            <i class="bi bi-chevron-right submenu-indicator ms-auto"></i>
         @endif
     </a>
 
     @if($hasChildren)
-    <ul class="list-group submenu shadow-lg rounded-3 submenu-level-{{ $level + 1 }}">
-        {{-- Ссылка "Все в..." только для первого уровня подменю (когда основной элемент категории имеет детей) --}}
-        @if($level === 0)
-        <li class="list-group-item">
-            <a href="{{ route('catalog.index', array_merge(request()->except(array_merge(['page', 'brands', 'min_price', 'max_price', 'availability', 'is_new'], $allSpecificFilterKeys)), ['category' => $categoryItem->slug])) }}"
-                class="list-group-item-action subcategory-link {{ $isActiveParent && !$isChildActive ? 'active' : '' }}"
-                style="padding-left: {{ 0.75 + (($level + 1) * 0.8) }}rem;">
-                Все в "{{ $displayName }}"
-            </a>
-        </li>
-        @endif
-        @foreach($subcategoriesToDisplayCollection as $subCategory)
-        {{-- Рекурсивный вызов для дочерних элементов --}}
-        @include('catalog.partials.category_submenu_item_recursive', [
-        'categoryItem' => $subCategory,
-        'selectedCategorySlug' => $selectedCategorySlug,
-        'allSpecificFilterKeys' => $allSpecificFilterKeys,
-        'level' => $level + 1,
-        'categoryNameMapping' => $categoryNameMapping
-        ])
-        @endforeach
-    </ul>
+        <ul class="list-group submenu shadow-lg rounded-3 py-1 submenu-level-{{ $level + 1 }}">
+            @if($level === 0 && $isActiveCategory) {{-- Show "All in..." only if current category is active --}}
+                <li class="list-group-item">
+                    <a href="{{ route('catalog.index', array_merge($currentParamsToKeep, ['category' => $categoryItem->slug, 'page' => 1])) }}"
+                       class="list-group-item-action subcategory-link d-flex align-items-center active"
+                       style="padding-left: {{ 0.75 + (($level + 1) * 0.8) }}rem;">
+                        <img src="{{ $iconUrl }}" alt="" class="category-icon me-2">
+                        <span class="category-text flex-grow-1">Все в "{{ $displayName }}"</span>
+                    </a>
+                </li>
+            @endif
+            @foreach($subcategoriesToDisplayCollection as $subCategory)
+                @include('catalog.partials.category_submenu_item_recursive', [
+                    'categoryItem' => $subCategory,
+                    'selectedCategorySlug' => $selectedCategorySlug,
+                    'allSpecificFilterKeys' => $allSpecificFilterKeys,
+                    'keysToClearOnNavigateOrReset' => $keysToClearOnNavigateOrReset,
+                    'level' => $level + 1,
+                    'categoryNameMapping' => $categoryNameMapping,
+                    'categoryIconMapping' => $categoryIconMapping,
+                    'defaultCategoryIconPath' => $defaultCategoryIconPath
+                ])
+            @endforeach
+        </ul>
     @endif
 </li>

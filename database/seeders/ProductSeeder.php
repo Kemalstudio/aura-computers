@@ -5,345 +5,250 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Attribute;
+use App\Models\ProductAttributeValue;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $brandSamsung = Brand::firstOrCreate(['slug' => 'samsung'], ['name' => 'Samsung', 'is_visible' => true]);
-        $brandIntel = Brand::firstOrCreate(['slug' => 'intel'], ['name' => 'Intel', 'is_visible' => true]);
-        $brandNvidia = Brand::firstOrCreate(['slug' => 'nvidia'], ['name' => 'NVIDIA', 'is_visible' => true]);
-        $brandGigabyte = Brand::firstOrCreate(['slug' => 'gigabyte'], ['name' => 'Gigabyte', 'is_visible' => true]);
-        $brandXiaomi = Brand::firstOrCreate(['slug' => 'xiaomi'], ['name' => 'Xiaomi', 'is_visible' => true]);
-        $brandAcer = Brand::firstOrCreate(['slug' => 'acer'], ['name' => 'Acer', 'is_visible' => true]);
-        $brandKingston = Brand::firstOrCreate(['slug' => 'kingston'], ['name' => 'Kingston', 'is_visible' => true]);
-        $brand2E = Brand::firstOrCreate(['slug' => '2e'], ['name' => '2E', 'is_visible' => true]);
-        $brandAsusROG = Brand::firstOrCreate(['slug' => 'asusrog'], ['name' => 'REPUBLIC OF GAMERS', 'is_visible' => true]);
-        $brandAsus = Brand::firstOrCreate(['slug' => 'asus'], ['name' => 'ASUS', 'is_visible' => true]);
-        $brandSTEELSERIES = Brand::firstOrCreate(['slug' => 'steelseries'], ['name' => 'STEELSERIES', 'is_visible' => true]);
-        $brandLogitech = Brand::firstOrCreate(['slug' => 'logitech'], ['name' => 'Logitech', 'is_visible' => true]);
-        $brandMSI = Brand::firstOrCreate(['slug' => 'MSI'], ['name' => 'MSI', 'is_visible' => true]);
-        $brandLenovo = Brand::firstOrCreate(['slug' => 'Lenovo'], ['name' => 'Lenovo', 'is_visible' => true]);
+        $this->command->info('Starting ProductSeeder...');
 
+        // --- Brand Creation ---
+        $brands = [
+            'samsung' => Brand::firstOrCreate(['slug' => 'samsung'], ['name' => 'Samsung', 'is_visible' => true]),
+            'intel' => Brand::firstOrCreate(['slug' => 'intel'], ['name' => 'Intel', 'is_visible' => true]),
+            'nvidia' => Brand::firstOrCreate(['slug' => 'nvidia'], ['name' => 'NVIDIA', 'is_visible' => true]),
+            'gigabyte' => Brand::firstOrCreate(['slug' => 'gigabyte'], ['name' => 'Gigabyte', 'is_visible' => true]),
+            'xiaomi' => Brand::firstOrCreate(['slug' => 'xiaomi'], ['name' => 'Xiaomi', 'is_visible' => true]),
+            'acer' => Brand::firstOrCreate(['slug' => 'acer'], ['name' => 'Acer', 'is_visible' => true]),
+            'kingston' => Brand::firstOrCreate(['slug' => 'kingston'], ['name' => 'Kingston', 'is_visible' => true]),
+            'asusrog' => Brand::firstOrCreate(['slug' => 'asusrog'], ['name' => 'ASUS ROG', 'is_visible' => true]),
+            'asus' => Brand::firstOrCreate(['slug' => 'asus'], ['name' => 'ASUS', 'is_visible' => true]),
+            'steelseries' => Brand::firstOrCreate(['slug' => 'steelseries'], ['name' => 'SteelSeries', 'is_visible' => true]),
+            'logitech' => Brand::firstOrCreate(['slug' => 'logitech'], ['name' => 'Logitech', 'is_visible' => true]),
+            'msi' => Brand::firstOrCreate(['slug' => 'msi'], ['name' => 'MSI', 'is_visible' => true]),
+            'lenovo' => Brand::firstOrCreate(['slug' => 'lenovo'], ['name' => 'Lenovo', 'is_visible' => true]),
+            'apple' => Brand::firstOrCreate(['slug' => 'apple'], ['name' => 'Apple', 'is_visible' => true]),
+            'amd' => Brand::firstOrCreate(['slug' => 'amd'], ['name' => 'AMD', 'is_visible' => true]),
+            'corsair' => Brand::firstOrCreate(['slug' => 'corsair'], ['name' => 'Corsair', 'is_visible' => true]),
+            'lg' => Brand::firstOrCreate(['slug' => 'lg'], ['name' => 'LG', 'is_visible' => true]),
+            'hyperx' => Brand::firstOrCreate(['slug' => 'hyperx'], ['name' => 'HyperX', 'is_visible' => true]),
+        ];
 
-        $categoryLaptopsParent = Category::updateOrCreate(
-            ['slug' => 'laptops-and-other'],
-            ['name' => 'Ноутбуки и прочее', 'description' => 'Портативные компьютеры, сумки, аксессуары.', 'is_visible' => true, 'sort_order' => 10]
-        );
-        $categoryLaptopsNotebooks = Category::updateOrCreate(
-            ['slug' => 'laptops-notebooks'],
-            ['name' => 'Ноутбуки', 'description' => 'Различные модели ноутбуков.', 'parent_id' => $categoryLaptopsParent->id, 'is_visible' => true, 'sort_order' => 1]
-        );
+        // --- Category Creation ---
+        $rootCategories = [
+            'laptops-and-other' => Category::updateOrCreate(['slug' => 'laptops-and-other'], ['name' => 'Ноутбуки и аксессуары', 'is_visible' => true, 'sort_order' => 10]),
+            'pc-components' => Category::updateOrCreate(['slug' => 'pc-components'], ['name' => 'Комплектующие для ПК', 'is_visible' => true, 'sort_order' => 20]),
+            'peripherals' => Category::updateOrCreate(['slug' => 'peripherals'], ['name' => 'Периферия', 'is_visible' => true, 'sort_order' => 30]),
+            'smartphones-tablets' => Category::updateOrCreate(['slug' => 'smartphones-tablets'], ['name' => 'Смартфоны и планшеты', 'is_visible' => true, 'sort_order' => 40]),
+            'monitors-tv' => Category::updateOrCreate(['slug' => 'monitors-tv'], ['name' => 'Мониторы и ТВ', 'is_visible' => true, 'sort_order' => 50]),
+        ];
 
-        $categoryComponentsParent = Category::updateOrCreate(
-            ['slug' => 'pc-components'],
-            ['name' => 'Комплектующие для ПК', 'description' => 'Процессоры, видеокарты, оперативная память и другие компоненты для сборки и апгрейда ПК.', 'is_visible' => true, 'sort_order' => 20]
-        );
-        $categoryCpu = Category::updateOrCreate(
-            ['slug' => 'components-cpu'],
-            ['name' => 'Процессоры (CPU)', 'description' => 'Центральные процессоры для компьютеров.', 'parent_id' => $categoryComponentsParent->id, 'is_visible' => true, 'sort_order' => 1]
-        );
-        $categoryGpu = Category::updateOrCreate(
-            ['slug' => 'components-gpu'],
-            ['name' => 'Видеокарты (GPU)', 'description' => 'Графические ускорители для игр и профессиональных задач.', 'parent_id' => $categoryComponentsParent->id, 'is_visible' => true, 'sort_order' => 2]
-        );
-        $categoryRam = Category::updateOrCreate(
-            ['slug' => 'components-ram'],
-            ['name' => 'Оперативная память (RAM)', 'description' => 'Модули оперативной памяти для ПК и ноутбуков.', 'parent_id' => $categoryComponentsParent->id, 'is_visible' => true, 'sort_order' => 3]
-        );
-
-        $categoryPeripheralsParent = Category::updateOrCreate(
-            ['slug' => 'peripherals'],
-            ['name' => 'Периферия', 'description' => 'Устройства ввода-вывода и другие аксессуары для компьютеров.', 'is_visible' => true, 'sort_order' => 30]
-        );
-        $categoryKeyboards = Category::updateOrCreate(
-            ['slug' => 'peripherals-keyboards'],
-            ['name' => 'Клавиатуры', 'description' => 'Механические, мембранные и другие клавиатуры.', 'parent_id' => $categoryPeripheralsParent->id, 'is_visible' => true, 'sort_order' => 1]
-        );
-        $categoryMice = Category::updateOrCreate(
-            ['slug' => 'peripherals-mice'],
-            ['name' => 'Мыши', 'description' => 'Игровые и офисные компьютерные мыши.', 'parent_id' => $categoryPeripheralsParent->id, 'is_visible' => true, 'sort_order' => 2]
-        );
-        $categoryWebcams = Category::updateOrCreate(
-            ['slug' => 'peripherals-webcams'],
-            ['name' => 'Веб-камеры', 'description' => 'Камеры для видеоконференций и стриминга.', 'parent_id' => $categoryPeripheralsParent->id, 'is_visible' => true, 'sort_order' => 3]
-        );
-
-
-        $categorySmartphonesParent = Category::updateOrCreate(
-            ['slug' => 'smartphones'],
-            ['name' => 'Смартфоны', 'description' => 'Мобильные телефоны с расширенными возможностями.', 'is_visible' => true, 'sort_order' => 40]
-        );
-        $categorySmartphonesFlagship = Category::updateOrCreate(
-            ['slug' => 'smartphones-flagship'],
-            ['name' => 'Флагманы', 'description' => 'Топовые модели смартфонов с максимальной производительностью.', 'parent_id' => $categorySmartphonesParent->id, 'is_visible' => true, 'sort_order' => 1]
-        );
-        $categorySmartphonesBudget = Category::updateOrCreate(
-            ['slug' => 'smartphones-budget'],
-            ['name' => 'Бюджетные смартфоны', 'description' => 'Доступные модели смартфонов с хорошим соотношением цена/качество.', 'parent_id' => $categorySmartphonesParent->id, 'is_visible' => true, 'sort_order' => 2]
-        );
-
-        $categoryHomeAppliancesParent = Category::updateOrCreate(
-            ['slug' => 'home-appliances'],
-            ['name' => 'Бытовая техника', 'description' => 'Техника для дома и кухни.', 'is_visible' => true, 'sort_order' => 50]
-        );
-        $categoryTv = Category::updateOrCreate(
-            ['slug' => 'home-appliances-tv'],
-            ['name' => 'Телевизоры', 'description' => 'Современные телевизоры с различными технологиями экрана.', 'parent_id' => $categoryHomeAppliancesParent->id, 'is_visible' => true, 'sort_order' => 1]
-        );
+        $categories = [
+            'laptops-notebooks' => Category::updateOrCreate(['slug' => 'laptops-notebooks'], ['name' => 'Ноутбуки', 'parent_id' => $rootCategories['laptops-and-other']->id, 'is_visible' => true, 'sort_order' => 1]),
+            'ultrabooks' => Category::updateOrCreate(['slug' => 'ultrabooks'], ['name' => 'Ультрабуки', 'parent_id' => $rootCategories['laptops-and-other']->id, 'is_visible' => true, 'sort_order' => 2]),
+            'gaming-laptops' => Category::updateOrCreate(['slug' => 'gaming-laptops'], ['name' => 'Игровые ноутбуки', 'parent_id' => $rootCategories['laptops-and-other']->id, 'is_visible' => true, 'sort_order' => 3]),
+            'components-cpu' => Category::updateOrCreate(['slug' => 'components-cpu'], ['name' => 'Процессоры (CPU)', 'parent_id' => $rootCategories['pc-components']->id, 'is_visible' => true, 'sort_order' => 1]),
+            'components-gpu' => Category::updateOrCreate(['slug' => 'components-gpu'], ['name' => 'Видеокарты (GPU)', 'parent_id' => $rootCategories['pc-components']->id, 'is_visible' => true, 'sort_order' => 2]),
+            'components-ram' => Category::updateOrCreate(['slug' => 'components-ram'], ['name' => 'Оперативная память (RAM)', 'parent_id' => $rootCategories['pc-components']->id, 'is_visible' => true, 'sort_order' => 3]),
+            'components-motherboards' => Category::updateOrCreate(['slug' => 'components-motherboards'], ['name' => 'Материнские платы', 'parent_id' => $rootCategories['pc-components']->id, 'is_visible' => true, 'sort_order' => 4]),
+            'components-ssd' => Category::updateOrCreate(['slug' => 'components-ssd'], ['name' => 'SSD накопители', 'parent_id' => $rootCategories['pc-components']->id, 'is_visible' => true, 'sort_order' => 5]),
+            'components-hdd' => Category::updateOrCreate(['slug' => 'components-hdd'], ['name' => 'HDD накопители', 'parent_id' => $rootCategories['pc-components']->id, 'is_visible' => true, 'sort_order' => 6]),
+            'peripherals-keyboards' => Category::updateOrCreate(['slug' => 'peripherals-keyboards'], ['name' => 'Клавиатуры', 'parent_id' => $rootCategories['peripherals']->id, 'is_visible' => true, 'sort_order' => 1]),
+            'peripherals-mice' => Category::updateOrCreate(['slug' => 'peripherals-mice'], ['name' => 'Мыши', 'parent_id' => $rootCategories['peripherals']->id, 'is_visible' => true, 'sort_order' => 2]),
+            'peripherals-headsets' => Category::updateOrCreate(['slug' => 'peripherals-headsets'], ['name' => 'Наушники и гарнитуры', 'parent_id' => $rootCategories['peripherals']->id, 'is_visible' => true, 'sort_order' => 3]),
+            'smartfony' => Category::updateOrCreate(['slug' => 'smartfony'], ['name' => 'Смартфоны', 'parent_id' => $rootCategories['smartphones-tablets']->id, 'is_visible' => true, 'sort_order' => 1]),
+            'tablets' => Category::updateOrCreate(['slug' => 'tablets'], ['name' => 'Планшеты', 'parent_id' => $rootCategories['smartphones-tablets']->id, 'is_visible' => true, 'sort_order' => 2]),
+            'monitory-dlya-pk' => Category::updateOrCreate(['slug' => 'monitory-dlya-pk'], ['name' => 'Мониторы для ПК', 'parent_id' => $rootCategories['monitors-tv']->id, 'is_visible' => true, 'sort_order' => 1]),
+            'televizory' => Category::updateOrCreate(['slug' => 'televizory'], ['name' => 'Телевизоры', 'parent_id' => $rootCategories['monitors-tv']->id, 'is_visible' => true, 'sort_order' => 2]),
+        ];
 
         $defaultProductAttributes = [
-            'is_visible' => true,
-            'is_featured' => false,
-            'is_new' => false,
-            'on_sale' => false,
-            'price' => 100.00,
-            'sale_price' => null,
-            'quantity' => 10,
-            'sku' => null,
-            'barcode' => null,
-            'brand_id' => null,
-            'category_id' => null,
-            'thumbnail_url' => 'https://via.placeholder.com/300x300.png?text=Product',
+            'is_visible' => true, 'is_featured' => false, 'is_new' => false, 'on_sale' => false,
+            'price' => 100.00, 'sale_price' => null, 'quantity' => 10,
+            'sku' => null, 'barcode' => null, 'brand_id' => null, 'category_id' => null,
+            'thumbnail_url' => 'https://placehold.co/600x600/EEE/31343C?text=Product',
             'images' => json_encode([
-                'https://via.placeholder.com/600x600.png?text=Image1',
-                'https://via.placeholder.com/600x600.png?text=Image2'
+                'https://placehold.co/800x800/DDD/31343C?text=Image+1',
+                'https://placehold.co/800x800/CCC/31343C?text=Image+2'
             ]),
-            'meta_title' => null,
-            'meta_description' => null,
-            'meta_keywords' => null,
-            'specifications' => json_encode([]),
+            'meta_title' => null, 'meta_description' => null, 'meta_keywords' => null,
         ];
 
-        $products = [
+        $productsDataArray = [
             [
-                'name' => 'Игровой ноутбук ACER NITRO 5 AN515-45-R56R (Процессор AMD Ryzen7 5800H)',
-                'thumbnail_url' => 'https://sumbar-computer.com/storage/sm/ip/z5WV57FK5mhdx6XUPKXH.jpg',
-                'price' => 16038.00,
-                'quantity' => 5,
-                'category_id' => $categoryLaptopsNotebooks->id,
-                'brand_id' => $brandAcer->id,
-                'is_featured' => true,
-                'sku' => 'NH.QBAEM.002',
-                'description' => 'Игровой ноутбук ACER NITRO 5 AN515-45-R56R (Процессор AMD Ryzen7 5800H / Оперативная память 16GB (DDR4) / SSD 512GB / Диагональ экрана 15.6" дюйма FHD 144Hz IPS / Видеокарта NVIDIA RTX 3050 4GB / Дисковод отсутствует / Язык Английский и Русский / Черный цвет) (NH.QBAEM.002)',
-                'long_description' => 'Игровой ноутбук ACER NITRO 5 AN515-45-R56R (Процессор AMD Ryzen7 5800H / Оперативная память 16GB (DDR4) / SSD 512GB / Диагональ экрана 15.6" дюйма FHD 144Hz IPS / Видеокарта NVIDIA RTX 3050 4GB / Дисковод отсутствует / Язык Английский и Русский / Черный цвет) (NH.QBAEM.002). Откройте для себя новый уровень гейминга с ACER NITRO 5. Мощный процессор AMD Ryzen и видеокарта NVIDIA GeForce RTX обеспечивают плавный игровой процесс даже в самых требовательных играх. Яркий IPS-дисплей с высокой частотой обновления 144 Гц гарантирует четкое и детализированное изображение без разрывов. Эффективная система охлаждения CoolBoost позволяет ноутбуку работать на максимальной производительности без перегрева.',
-                'specifications' => [
-                    'Размер экрана (дюймы)' => 15.6,
-                    'Разрешение экрана' => '1920x1080',
-                    'Тип матрицы' => 'IPS',
-                    'Частота обновления (Гц)' => 144,
-                    'Объем ОЗУ (ГБ)' => 16,
-                    'Тип ОЗУ' => 'DDR4',
-                    'Тип процессора' => 'AMD Ryzen 7 5800H',
-                    'Количество ядер процессора' => 8,
-                    'Объем SSD (ГБ)' => 512,
-                    'Тип видеокарты' => 'NVIDIA GeForce RTX 3050',
-                    'Объем видеопамяти (ГБ)' => 4,
-                    'Операционная система' => 'Без ОС',
-                    'Клавиатура' => 'С подсветкой (красная)',
-                    'Беспроводные интерфейсы' => 'Wi-Fi 6, Bluetooth 5.1',
-                    'Порты' => '1x HDMI 2.1, 1x USB 3.2 Gen 2 Type-C (DP), 3x USB 3.2 Gen 1 Type-A, RJ45, Audio Jack',
-                    'Цвет' => 'Черный',
-                    'Вес (кг)' => '2.20',
-                    'Батарея' => '57 Вт*ч',
+                'name' => 'Apple MacBook Air 13" M2 (8C CPU, 8C GPU), 8GB, 256GB SSD, Space Gray',
+                'price' => 22999.00, 'quantity' => 10, 'category_id' => $categories['ultrabooks']->id, 'brand_id' => $brands['apple']->id, 'is_new' => true,
+                'thumbnail_url' => 'https://placehold.co/600x600/D3D3D3/000000?text=MacBook+Air+M2',
+                'images' => ['https://placehold.co/800x800/D3D3D3/000000?text=MacBook+Air+M2+Front', 'https://placehold.co/800x800/C0C0C0/000000?text=MacBook+Air+M2+Side'],
+                'description' => 'Ультратонкий и легкий MacBook Air с мощным чипом M2.',
+                'attributes_map' => [
+                    'screen_size' => 13.6, 'resolution' => '2560x1664', 'matrix_type' => 'IPS',
+                    'ram_size' => 8, 'ram_type' => 'Unified', 'cpu_series' => 'Apple M2',
+                    'cpu_cores' => 8, 'gpu_model' => '8-core GPU', 'storage_type' => 'SSD',
+                    'ssd_volume' => 256, 'os_type' => 'macOS', 'keyboard_backlight' => 'Есть (одноцветная)',
+                    'color' => 'Серый космос', 'material' => 'Алюминий', 'warranty' => 12, 'touchscreen' => false
                 ]
             ],
             [
-                'name' => 'Игровой ноутбук ASUS ROG STRIX G513RC (Процессор AMD Ryzen7 6800H)',
-                'thumbnail_url' => 'https://sumbar-computer.com/storage/sm/ip/ackKGWyLq6DY3yPNqQPK.jpg',
-                'price' => 21195.00,
-                'quantity' => 8,
-                'category_id' => $categoryLaptopsNotebooks->id,
-                'brand_id' => $brandAsusROG->id,
-                'is_featured' => true,
-                'sku' => '90NR08A5-M006Z0',
-                'description' => 'Игровой ноутбук ASUS ROG STRIX G513RC (Процессор AMD Ryzen7 6800H / Оперативная память 16GB (DDR5) / SSD 512GB / Диагональ экрана 15.6" дюйма FHD 144Hz IPS / Видеокарта NVIDIA RTX 3050 4GB / Мышка ROG IMPACT в комплекте / Серый цвет) (90NR08A5-M006Z0)',
-                'long_description' => 'ASUS ROG STRIX G513RC - это мощь и стиль в одном корпусе. Процессор AMD Ryzen 7 6000-й серии и видеокарта NVIDIA GeForce RTX 3050 готовы к любым игровым вызовам. Память DDR5 обеспечивает высочайшую скорость работы. Уникальный дизайн с RGB-подсветкой Aura Sync подчеркнет вашу индивидуальность.',
-                'specifications' => [
-                    'Размер экрана (дюймы)' => 15.6,
-                    'Разрешение экрана' => '1920x1080',
-                    'Тип матрицы' => 'IPS',
-                    'Частота обновления (Гц)' => 144,
-                    'Объем ОЗУ (ГБ)' => 16,
-                    'Тип ОЗУ' => 'DDR5',
-                    'Тип процессора' => 'AMD Ryzen 7 6800H',
-                    'Количество ядер процессора' => 8,
-                    'Объем SSD (ГБ)' => 512,
-                    'Тип видеокарты' => 'NVIDIA GeForce RTX 3050',
-                    'Объем видеопамяти (ГБ)' => 4,
-                    'Операционная система' => 'Windows 11 Home',
-                    'Клавиатура' => 'С RGB подсветкой (4 зоны)',
-                    'Беспроводные интерфейсы' => 'Wi-Fi 6E, Bluetooth 5.2',
-                    'Порты' => '1x HDMI 2.0b, 1x USB 3.2 Gen 2 Type-C (DP/PD), 1x USB 3.2 Gen 2 Type-C, 2x USB 3.2 Gen 1 Type-A, RJ45, Audio Jack',
-                    'Цвет' => 'Серый (Eclipse Gray)',
-                    'Вес (кг)' => '2.10',
-                    'Комплектация' => 'Ноутбук, адаптер питания, мышь ROG IMPACT',
+                'name' => 'ASUS ROG Strix SCAR 17 G733, Ryzen 9 7945HX3D, 32GB, 2TB SSD, RTX 4090 16GB',
+                'price' => 75990.00, 'quantity' => 3, 'category_id' => $categories['gaming-laptops']->id, 'brand_id' => $brands['asusrog']->id, 'is_featured' => true,
+                'thumbnail_url' => 'https://placehold.co/600x600/333333/FFFFFF?text=ROG+Strix+SCAR+17',
+                'images' => ['https://placehold.co/800x800/333333/FFFFFF?text=ROG+Strix+Angle', 'https://placehold.co/800x800/444444/FFFFFF?text=ROG+Strix+Keyboard'],
+                'description' => 'Максимальная производительность для киберспорта.',
+                'attributes_map' => [
+                    'screen_size' => 17.3, 'resolution' => '2560x1440 (QHD)', 'matrix_type' => 'IPS',
+                    'refresh_rate' => 240, 'ram_size' => 32, 'ram_type' => 'DDR5',
+                    'cpu_series' => 'AMD Ryzen 9', 'cpu_model' => '7945HX3D', 'cpu_cores' => 16,
+                    'storage_type' => 'SSD', 'ssd_volume' => 2000, 'gpu_manufacturer' => 'NVIDIA',
+                    'gpu_model' => 'GeForce RTX 4090 Laptop', 'gpu_memory' => 16, 'os_type' => 'Windows 11 Pro',
+                    'keyboard_backlight' => 'Есть (RGB)', 'color' => 'Черный', 'warranty' => 24
                 ]
             ],
             [
-                'name' => 'Игровой ноутбук LENOVO LEGION PRO 7 16IAX10H (Процессор Intel® Core Ultra 9 275HX)',
-                'thumbnail_url' => 'https://sumbar-computer.com/storage/sm/ip/18NWaPLGwTmV95eTd7GX.jpg',
-                'price' => 49500.00,
-                'quantity' => 4,
-                'category_id' => $categoryLaptopsNotebooks->id,
-                'brand_id' => $brandLenovo->id,
-                'is_featured' => true,
-                'is_new' => true,
-                'sku' => 'PF5GZ237',
-                'description' => 'Игровой ноутбук LENOVO LEGION PRO 7 16IAX10H (Процессор Intel® Core Ultra 9 275HX / Оперативная память 32GB (DDR5) / SSD 1TB / Диагональ экрана 16" дюймов WQXGA OLED 240Hz / Видеокарта NVIDIA RTX 5080 16GB / Дисковод отсутствует / Язык Английский и Русский / Черный цвет) (PF5GZ237) ',
-                'long_description' => 'Игровой ноутбук LENOVO LEGION PRO 7 16IAX10H (Процессор Intel® Core Ultra 9 275HX / Оперативная память 32GB (DDR5) / SSD 1TB / Диагональ экрана 16" дюймов WQXGA OLED 240Hz / Видеокарта NVIDIA RTX 5080 16GB / Дисковод отсутствует / Язык Английский и Русский / Черный цвет) (PF5GZ237) ',
-                'specifications' => [
-                    'Размер экрана (дюймы)' => 16,
-                    'Разрешение экрана' => ' 	2560x1600',
-                    'Тип матрицы' => 'OLED',
-                    'Частота обновления (Гц)' => 240,
-                    'Объем ОЗУ (ГБ)' => 32,
-                    'Тип ОЗУ' => 'DDR5',
-                    'Тип процессора' => 'Intel Ultra 9',
-                    'Количество ядер процессора' => 24,
-                    'Объем SSD (ТБ)' => 1,
-                    'Тип видеокарты' => 'NVIDIA RTX 5080',
-                    'Объем видеопамяти (ГБ)' => 16,
-                    'Порты подключения' => 'HDMI / 2 х USB 3.2 gen 1 / 1 х USB 3.2 gen 2 / 1 х Type-C 3.2 gen 2 / 1 х Thunderbolt v4 / LAN',
-                    'Тип клавиатуры' => 'мембранная',
-                    'Язык клавиш' => 'английский',
-                    'Ёмкость аккумулятора' => '99.9 Вт/ч',
-                    'Операционная система' => 'нет (опционально)',
-                    'Цвет' => 'чёрный',
-                    'Сканер отпечатка пальца' => 'нет',
-                    'Web-камера' => '5 МП (2560x1920)',
-                    'Материал корпуса' => 'алюминий / пластик',
+                'name' => 'LG UltraGear 27GP850-B, 27" QHD Nano IPS 165Hz',
+                'price' => 8990.00, 'quantity' => 15, 'category_id' => $categories['monitory-dlya-pk']->id, 'brand_id' => $brands['lg']->id,
+                'thumbnail_url' => 'https://placehold.co/600x600/1E90FF/FFFFFF?text=LG+UltraGear+27',
+                'images' => ['https://placehold.co/800x800/1E90FF/FFFFFF?text=LG+Monitor+Front', 'https://placehold.co/800x800/4682B4/FFFFFF?text=LG+Monitor+Back'],
+                'description' => 'Игровой монитор с Nano IPS матрицей и G-Sync Compatible.',
+                'attributes_map' => [
+                    'screen_size' => 27.0, 'resolution' => '2560x1440 (QHD)', 'matrix_type' => 'Nano IPS',
+                    'refresh_rate' => 165, 'response_time' => 1, 'aspect_ratio' => '16:9',
+                    'brightness' => 350, 'hdr_support' => 'DisplayHDR 400',
+                    'ports_video' => '2x HDMI, 1x DisplayPort', 'color' => 'Черный', 'warranty' => 24
                 ]
             ],
             [
-                'name' => 'Игровой ноутбук MSI CROSSHAIR 17 (Процессор Intel® Core i7-12700H)',
-                'thumbnail_url' => 'https://sumbar-computer.com/storage/sm/ip/Z97EcPliyclzWMDmCth5.jpg',
-                'price' => 31680.00,
-                'quantity' => 13,
-                'category_id' => $categoryLaptopsNotebooks->id,
-                'brand_id' => $brandMSI->id,
-                'is_featured' => true,
-                'sku' => '9S7-17L352-288',
-                'description' => 'Игровой ноутбук MSI CROSSHAIR 17 (Процессор Intel® Core i7-12700H / Оперативная память 16GB (DDR4) / SSD 1TB / Диагональ экрана 17.3" дюймов FHD IPS 360Hz / Видеокарта NVIDIA RTX 3070 8GB / Дисковод отсутствует / Язык Английский и Русский / Черный с желтым цвет) (9S7-17L352-288) ',
-                'long_description' => 'ASUS ROG STRIX G513RC - это мощь и стиль в одном корпусе. Процессор AMD Ryzen 7 6000-й серии и видеокарта NVIDIA GeForce RTX 3050 готовы к любым игровым вызовам. Память DDR5 обеспечивает высочайшую скорость работы. Уникальный дизайн с RGB-подсветкой Aura Sync подчеркнет вашу индивидуальность.',
-                'specifications' => [
-                    'Размер экрана (дюймы)' => 17.3,
-                    'Разрешение экрана' => '1920x1080',
-                    'Тип матрицы' => 'IPS',
-                    'Частота обновления (Гц)' => 360,
-                    'Объем ОЗУ (ГБ)' => 16,
-                    'Тип ОЗУ' => 'DDR5',
-                    'Тип процессора' => 'Intel Core i7',
-                    'Количество ядер процессора' => 14,
-                    'Объем SSD (ТБ)' => 1,
-                    'Тип видеокарты' => 'NVIDIA RTX 3070',
-                    'Объем видеопамяти (ГБ)' => 8,
-                    'Тактовая частота' => '2,3 ГГц',
-                    'Тип клавиатуры' => 'мембранная',
-                    'Подсветка' => 'подсветка клавиатуры',
-                    'Беспроводные интерфейсы' => 'Wi-Fi 6E, Bluetooth 5.2',
-                    'Порты' => 'HDMI / 1 х USB 2.0 / 2 х USB 3.2 gen 1 / 1 х Type-C 3.2 gen 1 / AUX / LAN',
-                    'Цвет' => 'чёрный / жёлтый',
-                    'Материал корпуса' => 'пластик',
-                    'Ёмкость аккумулятора' => '90 Вт/ч',
+                'name' => 'Samsung Galaxy S24 Ultra 12/512GB Titanium Gray',
+                'price' => 28900.00, 'quantity' => 20, 'category_id' => $categories['smartfony']->id, 'brand_id' => $brands['samsung']->id, 'is_new' => true,
+                'thumbnail_url' => 'https://placehold.co/600x600/808080/FFFFFF?text=S24+Ultra',
+                'images' => ['https://placehold.co/800x800/808080/FFFFFF?text=S24+Ultra+Front', 'https://placehold.co/800x800/A9A9A9/FFFFFF?text=S24+Ultra+Back'],
+                'description' => 'Флагманский смартфон с Galaxy AI.',
+                'attributes_map' => [
+                    'screen_size' => 6.8, 'resolution' => '3120x1440 (QHD+)', 'matrix_type' => 'Dynamic AMOLED 2X',
+                    'refresh_rate' => 120, 'ram_size' => 12, 'cpu_series' => 'Snapdragon 8 Gen 3 for Galaxy',
+                    'storage_type' => 'UFS 4.0', 'ssd_volume' => 512, 'os_type' => 'Android',
+                    'main_camera_mp' => '200+50+12+10', 'battery_capacity' => 5000, 'nfc_support' => true,
+                    'color' => 'Титановый Серый', 'material' => 'Титан, Стекло', 'warranty' => 12,
+                    'sim_cards' => '2 + eSIM', 'network_support' => '5G, LTE'
                 ]
             ],
             [
-                'name' => 'Компьютерная мышь ASUS WT425',
-                'thumbnail_url' => 'https://sumbar-computer.com/storage/sm/ip/0kCiyd0wydxbvCFxU79i.jpg',
-                'price' => 435.60,
-                'quantity' => 6,
-                'category_id' => $categoryMice->id,
-                'brand_id' => $brandAsus->id,
-                'is_featured' => true,
-                'sku' => '90XB0280-BMU040',
-                'description' => 'Компьютерная мышь ASUS WT425 (Беспроводная 2.4GHz / Оптическая / Эргономичная / 1600 DPI / 2 боковые кнопки / Синий цвет) (90XB0280-BMU040)',
-                'long_description' => 'Беспроводная оптическая мышь ASUS WT425 обеспечивает комфортную работу благодаря эргономичному дизайну. Разрешение сенсора до 1600 DPI и наличие боковых кнопок делают навигацию удобной.',
-                'specifications' => [
-                    'Тип подключения' => 'Беспроводное',
-                    'Интерфейс подключения' => 'Радиоканал 2.4 ГГц (USB-приемник)',
-                    'Сенсор' => 'Оптический',
-                    'Максимальное разрешение DPI' => 1600,
-                    'Количество кнопок' => 5,
-                    'Боковые кнопки' => 'Да (2)',
-                    'Тип питания' => '1x AA батарейка',
-                    'Радиус действия (м)' => 'до 10',
-                    'Дизайн' => 'Эргономичный (для правой руки)',
-                    'Цвет' => 'Синий/Черный',
-                    'Совместимость с ОС' => 'Windows, macOS, Linux',
-                    'Размеры (ДхШхВ, мм)' => '107 x 74 x 39',
-                    'Вес (г)' => '65 (без батарейки)',
+                'name' => 'Kingston KC3000 1TB NVMe PCIe 4.0 SSD',
+                'price' => 2150.00, 'quantity' => 30, 'category_id' => $categories['components-ssd']->id, 'brand_id' => $brands['kingston']->id,
+                'thumbnail_url' => 'https://placehold.co/600x600/FF0000/FFFFFF?text=Kingston+KC3000',
+                'images' => ['https://placehold.co/800x800/FF0000/FFFFFF?text=KC3000+Top'],
+                'description' => 'Высокопроизводительный SSD для геймеров.',
+                'attributes_map' => [
+                    'storage_type' => 'SSD M.2 NVMe', 'ssd_volume' => 1000,
+                    'interface' => 'PCIe 4.0 x4', 'warranty' => 60
                 ]
             ],
             [
-                'name' => 'Компьютерная мышь STEELSERIES AEROX 3',
-                'thumbnail_url' => 'https://sumbar-computer.com/storage/sm/ip/3flOUADRwcpN2yOjdWri.jpg',
-                'price' => 1247.40,
-                'quantity' => 9,
-                'category_id' => $categoryMice->id,
-                'brand_id' => $brandSTEELSERIES->id,
-                'is_new' => true,
-                'is_featured' => true,
-                'sku' => '62599',
-                'description' => 'Ультралегкая игровая мышь STEELSERIES AEROX 3 с перфорированным корпусом, сенсором 8500 CPI, скоростью 300 IPS и RGB-подсветкой. Вес всего 57 грамм.',
-                'long_description' => 'SteelSeries Aerox 3 – это сверхлегкая игровая мышь, разработанная для максимальной скорости и производительности. Её уникальный перфорированный дизайн не только снижает вес до невероятных 57 грамм, но и обеспечивает вентиляцию ладони. Мышь оснащена высокоточным оптическим сенсором TrueMove Core.',
-                'specifications' => [
-                    'Тип подключения' => 'Проводное', 
-                    'Интерфейс подключения' => 'USB Type-C (кабель Super Mesh)', 
-                    'Сенсор' => 'Оптический (SteelSeries TrueMove Core)',
-                    'Максимальное разрешение CPI' => 8500, 
-                    'Максимальная скорость (IPS)' => 300, 
-                    'Максимальное ускорение (G)' => 35, 
-                    'Количество кнопок' => 6,
-                    'Тип переключателей' => 'Golden Micro IP54', 
-                    'Подсветка' => 'RGB (3 зоны)', 
-                    'Длина кабеля (м)' => '1.8',
-                    'Материал корпуса' => 'ABS-пластик',
-                    'Ножки (глайды)' => 'PTFE',
-                    'Цвет' => 'Черный', 
-                    'Совместимость с ОС' => 'Windows, macOS, Xbox, Linux',
-                    'Размеры (ДхШхВ, мм)' => '120.55x57.91x21.53', 
-                    'Вес (г)' => '57', 
+                'name' => 'Logitech G Pro X TKL Lightspeed Keyboard (Tactile)',
+                'price' => 3200.00, 'quantity' => 12, 'category_id' => $categories['peripherals-keyboards']->id, 'brand_id' => $brands['logitech']->id, 'is_featured' => true,
+                'thumbnail_url' => 'https://placehold.co/600x600/0000FF/FFFFFF?text=Logitech+G+Pro+X',
+                'images' => ['https://placehold.co/800x800/0000FF/FFFFFF?text=G+Pro+X+Keyboard'],
+                'description' => 'Компактная беспроводная игровая клавиатура.',
+                'attributes_map' => [
+                    'connection_type' => 'Беспроводное (Радиоканал)', 'keyboard_type' => 'Механическая',
+                    'switch_type' => 'GX Brown Tactile (сменные)', 'keyboard_backlight' => 'Есть (RGB Lightsync)',
+                    'color' => 'Черный', 'material' => 'Пластик, Металлическая пластина', 'warranty' => 24
+                ]
+            ],
+            [
+                'name' => 'Процессор Intel Core i7-14700K LGA1700 BOX',
+                'price' => 9500.00, 'quantity' => 8, 'category_id' => $categories['components-cpu']->id, 'brand_id' => $brands['intel']->id, 'is_new' => true,
+                'thumbnail_url' => 'https://placehold.co/600x600/008080/FFFFFF?text=i7-14700K',
+                'description' => 'Новейший процессор Intel Core i7 14-го поколения для высокой производительности.',
+                'attributes_map' => [
+                    'cpu_series' => 'Intel Core i7', 'cpu_model' => '14700K', 'cpu_cores' => 20, // 8P + 12E
+                    'ram_type' => 'DDR5/DDR4', 'gpu_type' => 'Интегрированная Intel UHD Graphics 770',
+                    'warranty' => 36, 'material' => 'OEM Box'
+                ]
+            ],
+            [
+                'name' => 'Видеокарта ASUS ROG Strix GeForce RTX 4070 Ti SUPER OC 16GB',
+                'price' => 23500.00, 'quantity' => 5, 'category_id' => $categories['components-gpu']->id, 'brand_id' => $brands['asusrog']->id, 'is_featured' => true,
+                'thumbnail_url' => 'https://placehold.co/600x600/4B0082/FFFFFF?text=RTX+4070TiS',
+                'description' => 'Мощная видеокарта для игр в 4K с трассировкой лучей.',
+                'attributes_map' => [
+                    'gpu_manufacturer' => 'NVIDIA', 'gpu_model' => 'GeForce RTX 4070 Ti SUPER OC',
+                    'gpu_memory' => 16, 'ram_type' => 'GDDR6X', // Video RAM type
+                    'ports_video' => '3x DisplayPort 1.4a, 2x HDMI 2.1',
+                    'warranty' => 36, 'dimensions' => '336 x 150 x 63 мм'
                 ]
             ],
         ];
 
-        foreach ($products as $productData) {
+        $allDbAttributes = Attribute::all()->keyBy('slug');
+
+        foreach ($productsDataArray as $productData) {
+            $productAttributesToSave = $productData['attributes_map'] ?? [];
+            unset($productData['attributes_map']);
+            unset($productData['specifications']);
+
             if (isset($productData['images']) && is_array($productData['images'])) {
                 $productData['images'] = json_encode($productData['images']);
+            } elseif (!isset($productData['images'])) {
+                $productData['images'] = $defaultProductAttributes['images'];
             }
-            if (isset($productData['specifications']) && is_array($productData['specifications'])) {
-                $productData['specifications'] = json_encode($productData['specifications']);
+            if (!isset($productData['thumbnail_url'])) {
+                $productData['thumbnail_url'] = $defaultProductAttributes['thumbnail_url'];
             }
 
             $finalProductData = array_merge($defaultProductAttributes, $productData);
 
-            if (empty($finalProductData['sku'])) {
-                $finalProductData['sku'] = Str::upper(Str::random(4) . '-' . Str::random(6));
-            }
-            if (empty($finalProductData['meta_title'])) {
-                $finalProductData['meta_title'] = $finalProductData['name'] . ' - купить в Aura Computers';
-            }
-            if (empty($finalProductData['meta_description'])) {
-                $finalProductData['meta_description'] = 'Купить ' . $finalProductData['name'] . '. ' . Str::limit(strip_tags($finalProductData['description'] ?? ''), 150);
-            }
+            if (empty($finalProductData['sku'])) $finalProductData['sku'] = Str::upper(Str::random(4) . '-' . Str::random(6));
+            if (empty($finalProductData['meta_title'])) $finalProductData['meta_title'] = $finalProductData['name'] . ' - купить в Aura Computers';
+            if (empty($finalProductData['meta_description'])) $finalProductData['meta_description'] = 'Купить ' . $finalProductData['name'] . '. ' . Str::limit(strip_tags($finalProductData['description'] ?? ''), 150);
 
             $slug = Str::slug($finalProductData['name'], '-');
-            $originalSlug = $slug;
-            $count = 1;
-            $existingProduct = Product::where('slug', $slug)->first();
-            while ($existingProduct && (!isset($finalProductData['id']) || $existingProduct->id !== $finalProductData['id'])) {
+            $originalSlug = $slug; $count = 1;
+            while (Product::where('slug', $slug)->where('id', '!=', ($finalProductData['id'] ?? null))->exists()) {
                 $slug = $originalSlug . '-' . $count++;
-                $existingProduct = Product::where('slug', $slug)->first();
             }
             $finalProductData['slug'] = $slug;
 
-            Product::updateOrCreate(
-                ['slug' => $finalProductData['slug']],
-                $finalProductData
-            );
+            $createdProduct = Product::updateOrCreate(['slug' => $finalProductData['slug']], $finalProductData);
+
+            if ($createdProduct && !empty($productAttributesToSave)) {
+                foreach ($productAttributesToSave as $specNameOrSlug => $attributeData) {
+                    $attributeSlug = is_array($attributeData) ? ($attributeData['slug'] ?? null) : $specNameOrSlug;
+                    $attributeValue = is_array($attributeData) ? ($attributeData['value'] ?? null) : $attributeData;
+
+                    if (!$attributeSlug) {
+                        Log::warning("Missing slug for spec '{$specNameOrSlug}' on product '{$createdProduct->name}'.");
+                        continue;
+                    }
+
+                    if (isset($allDbAttributes[$attributeSlug])) {
+                        $dbAttribute = $allDbAttributes[$attributeSlug];
+
+                        if ($attributeSlug === 'ssd_volume_tb' && isset($allDbAttributes['ssd_volume'])) {
+                            $dbAttribute = $allDbAttributes['ssd_volume'];
+                            $attributeValue = (is_numeric($attributeValue)) ? (float)$attributeValue * 1000 : null;
+                        }
+
+                        if ($attributeValue !== null && (is_string($attributeValue) ? trim($attributeValue) !== '' : true) ) {
+                            $pav = ProductAttributeValue::updateOrCreate(
+                                ['product_id' => $createdProduct->id, 'attribute_id' => $dbAttribute->id],
+                                []
+                            );
+                            $pav->setRelation('attributeDefinition', $dbAttribute);
+                            $pav->value = $attributeValue;
+                            $pav->save();
+                        }
+                    } else {
+                        $this->command->warn("Attribute with slug '{$attributeSlug}' not found in DB for product '{$createdProduct->name}'. Spec name was '{$specNameOrSlug}'. Ensure this attribute is defined in AttributeSeeder.");
+                    }
+                }
+            }
         }
+        $this->command->info('Product seeding completed.');
     }
 }
