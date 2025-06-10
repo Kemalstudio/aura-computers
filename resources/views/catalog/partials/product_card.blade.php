@@ -1,4 +1,4 @@
-<div class="card shadow-sm product-card border-0 rounded-3 overflow-hidden d-flex flex-column">
+<div class="card shadow-sm product-card border-0 rounded-3 overflow-hidden d-flex flex-column h-100">
     <div class="product-card-top-actions position-absolute top-0 end-0 m-2 d-flex align-items-center" style="z-index: 10;">
         <!-- Compare Element -->
         <label class="product-action-control d-flex align-items-center p-1 rounded me-1" for="compareCheckbox_{{ $product->id ?? Str::random(5) }}" title="Сравнить"
@@ -16,9 +16,14 @@
         </button>
 
         <!-- Favorite Button -->
-        <button type="button" class="product-action-control product-action-favorite btn btn-light btn-sm p-0 d-flex align-items-center justify-content-center"
-            style="width: 24px; height: 24px; /* Base size */"
-            aria-label="Add to favorites" title="Add to favorites">
+        <button
+            type="button"
+            class="product-action-control product-action-favorite btn btn-light btn-sm p-0 d-flex align-items-center justify-content-center
+           @auth @if(Auth::user()->favorites->contains($product)) is-favorite @endif @endauth"
+            style="width: 24px; height: 24px;"
+            aria-label="Добавить в избранное"
+            title="Добавить в избранное"
+            data-product-id="{{ $product->id }}">
             <i class="bi bi-heart" style="font-size: 13px;"></i>
         </button>
     </div>

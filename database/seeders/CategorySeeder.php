@@ -34,6 +34,11 @@ class CategorySeeder extends Seeder
             ['slug' => 'laptops-notebooks', 'name' => 'Ноутбуки', 'parent_slug' => 'laptops-and-other', 'description' => 'Различные модели ноутбуков.', 'is_visible' => true, 'sort_order' => 1],
             ['slug' => 'ultrabooks', 'name' => 'Ультрабуки', 'parent_slug' => 'laptops-and-other', 'description' => 'Тонкие и легкие ноутбуки.', 'is_visible' => true, 'sort_order' => 2],
             ['slug' => 'gaming-laptops', 'name' => 'Игровые ноутбуки', 'parent_slug' => 'laptops-and-other', 'description' => 'Мощные ноутбуки для игр.', 'is_visible' => true, 'sort_order' => 3],
+
+            // ================== ДОБАВЛЕНО ==================
+            ['slug' => 'bags-and-backpacks', 'name' => 'Сумки и рюкзаки', 'parent_slug' => 'laptops-and-other', 'description' => 'Сумки и рюкзаки для ноутбуков и аксессуаров.', 'is_visible' => true, 'sort_order' => 4],
+            // ===============================================
+
             // PC Components
             ['slug' => 'components-cpu', 'name' => 'Процессоры (CPU)', 'parent_slug' => 'pc-components', 'description' => 'Центральные процессоры.', 'is_visible' => true, 'sort_order' => 1],
             ['slug' => 'components-gpu', 'name' => 'Видеокарты (GPU)', 'parent_slug' => 'pc-components', 'description' => 'Графические карты.', 'is_visible' => true, 'sort_order' => 2],

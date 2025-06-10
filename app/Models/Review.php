@@ -4,33 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Review extends Model
 {
     use HasFactory;
 
+    /**
+     * @var array<int, string>
+     */
     protected $fillable = [
         'product_id',
         'user_id',
-        'user_name',
+        'author_name',
         'rating',
         'comment',
-        'is_approved', // if you added this column
+        'is_approved', 
     ];
 
-    protected $casts = [
-        'rating' => 'integer',
-        'is_approved' => 'boolean', // if you added this column
-    ];
-
-    public function product(): BelongsTo
+    public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function user(): BelongsTo
+    public function user()
     {
-        return $this->belongsTo(User::class); // Assumes User model exists
+        return $this->belongsTo(User::class);
     }
 }

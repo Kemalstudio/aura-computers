@@ -1,35 +1,50 @@
 <?php
 
-// database/migrations/xxxx_xx_xx_xxxxxx_create_reviews_table.php
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     * Эта функция описывает, как СОЗДАТЬ таблицу `reviews`.
+     */
     public function up(): void
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            // Другие поля для отзыва, например:
-            $table->unsignedBigInteger('user_id')->nullable(); // Если отзывы от зарегистрированных пользователей
-            $table->string('user_name')->nullable();        // Или имя для анонимных
+
+            // Связь с продуктом, о котором отзыв
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+
+            // Связь с пользователем, который оставил отзыв
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+
+            // Имя автора (на случай, если пользователь удалит аккаунт или отзыв анонимный)
+            // Это поле может быть полезным, но не обязательным. Если у вас его нет, можно убрать.
+            $table->string('author_name')->nullable();
+
+            // Оценка от 1 до 5
+            $table->unsignedTinyInteger('rating')->default(5);
+
+            // Текст отзыва
             $table->text('comment');
-            $table->unsignedTinyInteger('rating')->nullable(); // Рейтинг от 1 до 5, например
 
-            // ВНЕШНИЙ КЛЮЧ ДЛЯ СВЯЗИ С ПРОДУКТОМ
-            $table->unsignedBigInteger('product_id'); // <--- ЭТО КЛЮЧЕВАЯ КОЛОНКА
-            // $table->foreignId('product_id')->constrained()->onDelete('cascade'); // Более краткий способ Laravel
+            // === ВАЖНАЯ КОЛОНКА ДЛЯ МОДЕРАЦИИ ===
+            // Она будет хранить 0 (false) или 1 (true).
+            // По умолчанию - false, то есть отзыв скрыт до одобрения.
+            $table->boolean('is_approved')->default(false);
+            // =====================================
 
-            $table->timestamps();
-
-            // Определение внешнего ключа (если не использовали ->constrained())
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            // Если user_id есть:
-            // $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->timestamps(); // Колонки created_at и updated_at
         });
     }
 
+    /**
+     * Reverse the migrations.
+     * Эта функция описывает, как УДАЛИТЬ таблицу `reviews`.
+     */
     public function down(): void
     {
         Schema::dropIfExists('reviews');

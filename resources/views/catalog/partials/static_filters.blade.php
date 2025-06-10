@@ -1,11 +1,14 @@
+{{-- resources/views/catalog/partials/static_filters.blade.php --}}
+{{-- ЭТОТ ФАЙЛ ТЕПЕРЬ СОДЕРЖИТ ТОЛЬКО СТАТИЧЕСКИЕ ФИЛЬТРЫ --}}
+
 {{-- Фильтр по брендам --}}
 @if(isset($availableBrands) && $availableBrands->count() > 0)
 @php $isBrandFilterApplied = isset($selectedBrandSlugs) && count($selectedBrandSlugs) > 0; @endphp
 <div class="filter-section mb-3 card">
-    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapseBrandsFilterContentNew" aria-expanded="{{ $isBrandFilterApplied ? 'true' : 'false' }}" aria-controls="collapseBrandsFilterContentNew">
+    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapseBrandsFilter" aria-expanded="{{ $isBrandFilterApplied ? 'true' : 'false' }}" aria-controls="collapseBrandsFilter">
         <span>Бренд</span> <i class="bi {{ $isBrandFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
     </h6>
-    <div class="collapse {{ $isBrandFilterApplied ? 'show' : '' }}" id="collapseBrandsFilterContentNew">
+    <div class="collapse {{ $isBrandFilterApplied ? 'show' : '' }}" id="collapseBrandsFilter">
         <div class="card-body filter-section-body">
             @foreach($availableBrands as $brand)
             <div class="form-check">
@@ -22,10 +25,10 @@
 @if(isset($overallMinPrice) && isset($overallMaxPrice) && $overallMaxPrice > $overallMinPrice)
 @php $isPriceFilterApplied = (request('min_price') !== null && request('min_price') != ($overallMinPrice ?? 0)) || (request('max_price') !== null && ($overallMaxPrice === null || request('max_price') != ($overallMaxPrice ?? 0))); @endphp
 <div class="filter-section mb-3 card">
-    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapsePriceFilterContentNew" aria-expanded="{{ $isPriceFilterApplied ? 'true' : 'false' }}" aria-controls="collapsePriceFilterContentNew">
+    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapsePriceFilter" aria-expanded="{{ $isPriceFilterApplied ? 'true' : 'false' }}" aria-controls="collapsePriceFilter">
         <span>Цена, TMT</span> <i class="bi {{ $isPriceFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
     </h6>
-    <div class="collapse {{ $isPriceFilterApplied ? 'show' : '' }}" id="collapsePriceFilterContentNew">
+    <div class="collapse {{ $isPriceFilterApplied ? 'show' : '' }}" id="collapsePriceFilter">
         <div class="card-body filter-section-body">
             <div class="d-flex align-items-center mb-2">
                 <input type="number" class="form-control form-control-sm text-center filter-input" name="min_price" id="min_price_filter" placeholder="{{ number_format($overallMinPrice ?? 0, 0, '.', '') }}" value="{{ request('min_price', '') }}" min="{{ $overallMinPrice ?? 0 }}" max="{{ $overallMaxPrice ?? 1000 }}" aria-label="Минимальная цена">
@@ -39,63 +42,29 @@
 @endif
 
 {{-- Фильтр "Особенности" --}}
-@php $isFeaturesFilterApplied = request('is_new') == '1' || !empty(request('availability')); @endphp
+@php
+$selectedAvailability = (array) request('availability', []);
+$isFeaturesFilterApplied = request('is_new') == '1' || !empty($selectedAvailability);
+@endphp
 <div class="filter-section mb-3 card">
-    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapseFeaturesFilterContentNew" aria-expanded="{{ $isFeaturesFilterApplied ? 'true' : 'false' }}" aria-controls="collapseFeaturesFilterContentNew">
+    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapseFeaturesFilter" aria-expanded="{{ $isFeaturesFilterApplied ? 'true' : 'false' }}" aria-controls="collapseFeaturesFilter">
         <span>Особенности</span> <i class="bi {{ $isFeaturesFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
     </h6>
-    <div class="collapse {{ $isFeaturesFilterApplied ? 'show' : '' }}" id="collapseFeaturesFilterContentNew">
+    <div class="collapse {{ $isFeaturesFilterApplied ? 'show' : '' }}" id="collapseFeaturesFilter">
         <div class="card-body filter-section-body">
             <div class="form-check">
                 <input class="form-check-input filter-input" type="checkbox" name="is_new" value="1" id="filter_is_new" @if(request('is_new')=='1' ) checked @endif>
                 <label class="form-check-label" for="filter_is_new">Только новинки</label>
             </div>
-            <div class="mt-2">
-                <label for="filter_availability" class="form-label visually-hidden">Наличие</label>
-                <select name="availability" id="filter_availability" class="form-select form-select-sm filter-input">
-                    <option value="" @if(!request('availability')) selected @endif>Любое наличие</option>
-                    <option value="in_stock" @if(request('availability')=='in_stock' ) selected @endif>В наличии</option>
-                    <option value="out_of_stock" @if(request('availability')=='out_of_stock' ) selected @endif>Нет в наличии</option>
-                </select>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Динамические специфические фильтры (если они были у вас ранее и вы хотите их оставить как общие) --}}
-@if(isset($availableSpecificFiltersData) && !empty($availableSpecificFiltersData))
-@foreach($availableSpecificFiltersData as $filterKey => $filterConfig)
-@if(!empty($filterConfig['options']))
-@php
-$currentRequestValue = request($filterKey);
-$isThisSpecificFilterApplied = $currentRequestValue !== null && $currentRequestValue !== '' && (!is_array($currentRequestValue) || !empty($currentRequestValue));
-@endphp
-<div class="filter-section mb-3 card">
-    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapseFilterContentNew{{ Str::studly($filterKey) }}" aria-expanded="{{ $isThisSpecificFilterApplied ? 'true' : 'false' }}" aria-controls="collapseFilterContentNew{{ Str::studly($filterKey) }}">
-        <span>{{ $filterConfig['label'] }}</span> 
-        <i class="bi {{ $isThisSpecificFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
-    </h6>
-    <div class="collapse {{ $isThisSpecificFilterApplied ? 'show' : '' }}" id="collapseFilterContentNew{{ Str::studly($filterKey) }}">
-        <div class="card-body filter-section-body">
-            @if($filterConfig['type'] === 'select')
-            <select name="{{ $filterKey }}" class="form-select form-select-sm filter-input">
-                <option value="" @if(empty($currentRequestValue)) selected @endif>Любой</option>
-                @foreach($filterConfig['options'] as $value => $label)
-                <option value="{{ $value }}" @if((string)$currentRequestValue==(string)$value && $currentRequestValue !==null && $currentRequestValue !=='' ) selected @endif>{{ $label }}</option>
-                @endforeach
-            </select>
-            @elseif($filterConfig['type'] === 'checkbox')
-            @php $requestArray = (array) $currentRequestValue; @endphp
-            @foreach($filterConfig['options'] as $value => $label)
+            <hr class="my-2">
             <div class="form-check">
-                <input class="form-check-input filter-input" type="checkbox" name="{{ $filterKey }}[]" value="{{ $value }}" id="filter_{{ $filterKey }}_{{ Str::slug($value) }}" @if(in_array((string)$value, $requestArray)) checked @endif>
-                <label class="form-check-label" for="filter_{{ $filterKey }}_{{ Str::slug($value) }}">{{ $label }}</label>
+                <input class="form-check-input filter-input" type="checkbox" name="availability[]" value="in_stock" id="filter_in_stock" @if(in_array('in_stock', $selectedAvailability)) checked @endif>
+                <label class="form-check-label" for="filter_in_stock">В наличии</label>
             </div>
-            @endforeach
-            @endif
+            <div class="form-check">
+                <input class="form-check-input filter-input" type="checkbox" name="availability[]" value="out_of_stock" id="filter_out_of_stock" @if(in_array('out_of_stock', $selectedAvailability)) checked @endif>
+                <label class="form-check-label" for="filter_out_of_stock">Нет в наличии</label>
+            </div>
         </div>
     </div>
-</div>
-@endif
-@endforeach
-@endif
+</div> 

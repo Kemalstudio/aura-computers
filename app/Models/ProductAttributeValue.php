@@ -3,24 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model; // <<< CRITICAL: Must extend this Model
+use Illuminate\Database\Eloquent\Model; 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Facades\Log;
 
-class ProductAttributeValue extends Pivot // <<< CRITICAL
+class ProductAttributeValue extends Pivot 
 {
     use HasFactory;
 
     protected $table = 'product_attribute_values';
 
-    // Since it extends Model and has its own 'id', these are typical.
     protected $primaryKey = 'id';
     public $incrementing = true;
 
-    // If your pivot table has created_at/updated_at, set this to true.
-    // Your migration has $table->timestamps(), so this should be true.
     public $timestamps = true;
 
     protected $fillable = [
@@ -52,20 +49,19 @@ class ProductAttributeValue extends Pivot // <<< CRITICAL
         return $this->belongsTo(Attribute::class, 'attribute_id');
     }
 
-    // --- Accessor for 'value' ---
     public function getValueAttribute()
     {
         $attributeDef = $this->attributeDefinition;
         if (!$attributeDef && $this->attribute_id) {
             if (!$this->relationLoaded('attributeDefinition')) {
                 try {
-                    $this->load('attributeDefinition'); // Attempt to load
+                    $this->load('attributeDefinition'); 
                 } catch (\Exception $e) {
                     Log::error("PAV Getter ID {$this->id}: Failed to load attributeDefinition. Error: " . $e->getMessage());
-                    $attributeDef = null; // Ensure it's null if load fails
+                    $attributeDef = null; 
                 }
             }
-            if ($this->relationLoaded('attributeDefinition')) { // Check again after attempting load
+            if ($this->relationLoaded('attributeDefinition')) { 
                 $attributeDef = $this->getRelation('attributeDefinition');
             }
         }
@@ -90,7 +86,6 @@ class ProductAttributeValue extends Pivot // <<< CRITICAL
         }
     }
 
-    // --- Mutator for 'value' ---
     public function setValueAttribute($value): void
     {
         $attributeDef = $this->attributeDefinition;

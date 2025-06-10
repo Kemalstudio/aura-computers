@@ -17,7 +17,6 @@ class ProductSeeder extends Seeder
     {
         $this->command->info('Starting ProductSeeder...');
 
-        // --- Brand Creation ---
         $brands = [
             'samsung' => Brand::firstOrCreate(['slug' => 'samsung'], ['name' => 'Samsung', 'is_visible' => true]),
             'intel' => Brand::firstOrCreate(['slug' => 'intel'], ['name' => 'Intel', 'is_visible' => true]),
@@ -37,11 +36,15 @@ class ProductSeeder extends Seeder
             'corsair' => Brand::firstOrCreate(['slug' => 'corsair'], ['name' => 'Corsair', 'is_visible' => true]),
             'lg' => Brand::firstOrCreate(['slug' => 'lg'], ['name' => 'LG', 'is_visible' => true]),
             'hyperx' => Brand::firstOrCreate(['slug' => 'hyperx'], ['name' => 'HyperX', 'is_visible' => true]),
+            'razer' => Brand::firstOrCreate(['slug' => 'razer'], ['name' => 'Razer', 'is_visible' => true]),
+            'dell' => Brand::firstOrCreate(['slug' => 'dell'], ['name' => 'Dell', 'is_visible' => true]),
+            'hp' => Brand::firstOrCreate(['slug' => 'hp'], ['name' => 'HP', 'is_visible' => true]),
+            'sony' => Brand::firstOrCreate(['slug' => 'sony'], ['name' => 'Sony', 'is_visible' => true]),
+            'google' => Brand::firstOrCreate(['slug' => 'google'], ['name' => 'Google', 'is_visible' => true]),
         ];
 
-        // --- Category Creation ---
         $rootCategories = [
-            'laptops-and-other' => Category::updateOrCreate(['slug' => 'laptops-and-other'], ['name' => 'Ноутбуки и аксессуары', 'is_visible' => true, 'sort_order' => 10]),
+            'laptops-and-other' => Category::updateOrCreate(['slug' => 'laptops-and-other'], ['name' => 'Ноутбуки и прочее', 'is_visible' => true, 'sort_order' => 10]),
             'pc-components' => Category::updateOrCreate(['slug' => 'pc-components'], ['name' => 'Комплектующие для ПК', 'is_visible' => true, 'sort_order' => 20]),
             'peripherals' => Category::updateOrCreate(['slug' => 'peripherals'], ['name' => 'Периферия', 'is_visible' => true, 'sort_order' => 30]),
             'smartphones-tablets' => Category::updateOrCreate(['slug' => 'smartphones-tablets'], ['name' => 'Смартфоны и планшеты', 'is_visible' => true, 'sort_order' => 40]),
@@ -57,7 +60,6 @@ class ProductSeeder extends Seeder
             'components-ram' => Category::updateOrCreate(['slug' => 'components-ram'], ['name' => 'Оперативная память (RAM)', 'parent_id' => $rootCategories['pc-components']->id, 'is_visible' => true, 'sort_order' => 3]),
             'components-motherboards' => Category::updateOrCreate(['slug' => 'components-motherboards'], ['name' => 'Материнские платы', 'parent_id' => $rootCategories['pc-components']->id, 'is_visible' => true, 'sort_order' => 4]),
             'components-ssd' => Category::updateOrCreate(['slug' => 'components-ssd'], ['name' => 'SSD накопители', 'parent_id' => $rootCategories['pc-components']->id, 'is_visible' => true, 'sort_order' => 5]),
-            'components-hdd' => Category::updateOrCreate(['slug' => 'components-hdd'], ['name' => 'HDD накопители', 'parent_id' => $rootCategories['pc-components']->id, 'is_visible' => true, 'sort_order' => 6]),
             'peripherals-keyboards' => Category::updateOrCreate(['slug' => 'peripherals-keyboards'], ['name' => 'Клавиатуры', 'parent_id' => $rootCategories['peripherals']->id, 'is_visible' => true, 'sort_order' => 1]),
             'peripherals-mice' => Category::updateOrCreate(['slug' => 'peripherals-mice'], ['name' => 'Мыши', 'parent_id' => $rootCategories['peripherals']->id, 'is_visible' => true, 'sort_order' => 2]),
             'peripherals-headsets' => Category::updateOrCreate(['slug' => 'peripherals-headsets'], ['name' => 'Наушники и гарнитуры', 'parent_id' => $rootCategories['peripherals']->id, 'is_visible' => true, 'sort_order' => 3]),
@@ -68,139 +70,98 @@ class ProductSeeder extends Seeder
         ];
 
         $defaultProductAttributes = [
-            'is_visible' => true, 'is_featured' => false, 'is_new' => false, 'on_sale' => false,
-            'price' => 100.00, 'sale_price' => null, 'quantity' => 10,
-            'sku' => null, 'barcode' => null, 'brand_id' => null, 'category_id' => null,
-            'thumbnail_url' => 'https://placehold.co/600x600/EEE/31343C?text=Product',
-            'images' => json_encode([
-                'https://placehold.co/800x800/DDD/31343C?text=Image+1',
-                'https://placehold.co/800x800/CCC/31343C?text=Image+2'
-            ]),
-            'meta_title' => null, 'meta_description' => null, 'meta_keywords' => null,
+            'is_visible' => true,
+            'is_featured' => false,
+            'is_new' => false,
+            'on_sale' => false,
+            'price' => 100.00,
+            'sale_price' => null,
+            'quantity' => 10,
+            'sku' => null,
+            'barcode' => null,
+            'brand_id' => null,
+            'category_id' => null,
+            'meta_title' => null,
+            'meta_description' => null,
+            'meta_keywords' => null,
         ];
 
         $productsDataArray = [
-            [
-                'name' => 'Apple MacBook Air 13" M2 (8C CPU, 8C GPU), 8GB, 256GB SSD, Space Gray',
-                'price' => 22999.00, 'quantity' => 10, 'category_id' => $categories['ultrabooks']->id, 'brand_id' => $brands['apple']->id, 'is_new' => true,
-                'thumbnail_url' => 'https://placehold.co/600x600/D3D3D3/000000?text=MacBook+Air+M2',
-                'images' => ['https://placehold.co/800x800/D3D3D3/000000?text=MacBook+Air+M2+Front', 'https://placehold.co/800x800/C0C0C0/000000?text=MacBook+Air+M2+Side'],
-                'description' => 'Ультратонкий и легкий MacBook Air с мощным чипом M2.',
-                'attributes_map' => [
-                    'screen_size' => 13.6, 'resolution' => '2560x1664', 'matrix_type' => 'IPS',
-                    'ram_size' => 8, 'ram_type' => 'Unified', 'cpu_series' => 'Apple M2',
-                    'cpu_cores' => 8, 'gpu_model' => '8-core GPU', 'storage_type' => 'SSD',
-                    'ssd_volume' => 256, 'os_type' => 'macOS', 'keyboard_backlight' => 'Есть (одноцветная)',
-                    'color' => 'Серый космос', 'material' => 'Алюминий', 'warranty' => 12, 'touchscreen' => false
-                ]
-            ],
-            [
-                'name' => 'ASUS ROG Strix SCAR 17 G733, Ryzen 9 7945HX3D, 32GB, 2TB SSD, RTX 4090 16GB',
-                'price' => 75990.00, 'quantity' => 3, 'category_id' => $categories['gaming-laptops']->id, 'brand_id' => $brands['asusrog']->id, 'is_featured' => true,
-                'thumbnail_url' => 'https://placehold.co/600x600/333333/FFFFFF?text=ROG+Strix+SCAR+17',
-                'images' => ['https://placehold.co/800x800/333333/FFFFFF?text=ROG+Strix+Angle', 'https://placehold.co/800x800/444444/FFFFFF?text=ROG+Strix+Keyboard'],
-                'description' => 'Максимальная производительность для киберспорта.',
-                'attributes_map' => [
-                    'screen_size' => 17.3, 'resolution' => '2560x1440 (QHD)', 'matrix_type' => 'IPS',
-                    'refresh_rate' => 240, 'ram_size' => 32, 'ram_type' => 'DDR5',
-                    'cpu_series' => 'AMD Ryzen 9', 'cpu_model' => '7945HX3D', 'cpu_cores' => 16,
-                    'storage_type' => 'SSD', 'ssd_volume' => 2000, 'gpu_manufacturer' => 'NVIDIA',
-                    'gpu_model' => 'GeForce RTX 4090 Laptop', 'gpu_memory' => 16, 'os_type' => 'Windows 11 Pro',
-                    'keyboard_backlight' => 'Есть (RGB)', 'color' => 'Черный', 'warranty' => 24
-                ]
-            ],
-            [
-                'name' => 'LG UltraGear 27GP850-B, 27" QHD Nano IPS 165Hz',
-                'price' => 8990.00, 'quantity' => 15, 'category_id' => $categories['monitory-dlya-pk']->id, 'brand_id' => $brands['lg']->id,
-                'thumbnail_url' => 'https://placehold.co/600x600/1E90FF/FFFFFF?text=LG+UltraGear+27',
-                'images' => ['https://placehold.co/800x800/1E90FF/FFFFFF?text=LG+Monitor+Front', 'https://placehold.co/800x800/4682B4/FFFFFF?text=LG+Monitor+Back'],
-                'description' => 'Игровой монитор с Nano IPS матрицей и G-Sync Compatible.',
-                'attributes_map' => [
-                    'screen_size' => 27.0, 'resolution' => '2560x1440 (QHD)', 'matrix_type' => 'Nano IPS',
-                    'refresh_rate' => 165, 'response_time' => 1, 'aspect_ratio' => '16:9',
-                    'brightness' => 350, 'hdr_support' => 'DisplayHDR 400',
-                    'ports_video' => '2x HDMI, 1x DisplayPort', 'color' => 'Черный', 'warranty' => 24
-                ]
-            ],
-            [
-                'name' => 'Samsung Galaxy S24 Ultra 12/512GB Titanium Gray',
-                'price' => 28900.00, 'quantity' => 20, 'category_id' => $categories['smartfony']->id, 'brand_id' => $brands['samsung']->id, 'is_new' => true,
-                'thumbnail_url' => 'https://placehold.co/600x600/808080/FFFFFF?text=S24+Ultra',
-                'images' => ['https://placehold.co/800x800/808080/FFFFFF?text=S24+Ultra+Front', 'https://placehold.co/800x800/A9A9A9/FFFFFF?text=S24+Ultra+Back'],
-                'description' => 'Флагманский смартфон с Galaxy AI.',
-                'attributes_map' => [
-                    'screen_size' => 6.8, 'resolution' => '3120x1440 (QHD+)', 'matrix_type' => 'Dynamic AMOLED 2X',
-                    'refresh_rate' => 120, 'ram_size' => 12, 'cpu_series' => 'Snapdragon 8 Gen 3 for Galaxy',
-                    'storage_type' => 'UFS 4.0', 'ssd_volume' => 512, 'os_type' => 'Android',
-                    'main_camera_mp' => '200+50+12+10', 'battery_capacity' => 5000, 'nfc_support' => true,
-                    'color' => 'Титановый Серый', 'material' => 'Титан, Стекло', 'warranty' => 12,
-                    'sim_cards' => '2 + eSIM', 'network_support' => '5G, LTE'
-                ]
-            ],
-            [
-                'name' => 'Kingston KC3000 1TB NVMe PCIe 4.0 SSD',
-                'price' => 2150.00, 'quantity' => 30, 'category_id' => $categories['components-ssd']->id, 'brand_id' => $brands['kingston']->id,
-                'thumbnail_url' => 'https://placehold.co/600x600/FF0000/FFFFFF?text=Kingston+KC3000',
-                'images' => ['https://placehold.co/800x800/FF0000/FFFFFF?text=KC3000+Top'],
-                'description' => 'Высокопроизводительный SSD для геймеров.',
-                'attributes_map' => [
-                    'storage_type' => 'SSD M.2 NVMe', 'ssd_volume' => 1000,
-                    'interface' => 'PCIe 4.0 x4', 'warranty' => 60
-                ]
-            ],
-            [
-                'name' => 'Logitech G Pro X TKL Lightspeed Keyboard (Tactile)',
-                'price' => 3200.00, 'quantity' => 12, 'category_id' => $categories['peripherals-keyboards']->id, 'brand_id' => $brands['logitech']->id, 'is_featured' => true,
-                'thumbnail_url' => 'https://placehold.co/600x600/0000FF/FFFFFF?text=Logitech+G+Pro+X',
-                'images' => ['https://placehold.co/800x800/0000FF/FFFFFF?text=G+Pro+X+Keyboard'],
-                'description' => 'Компактная беспроводная игровая клавиатура.',
-                'attributes_map' => [
-                    'connection_type' => 'Беспроводное (Радиоканал)', 'keyboard_type' => 'Механическая',
-                    'switch_type' => 'GX Brown Tactile (сменные)', 'keyboard_backlight' => 'Есть (RGB Lightsync)',
-                    'color' => 'Черный', 'material' => 'Пластик, Металлическая пластина', 'warranty' => 24
-                ]
-            ],
-            [
-                'name' => 'Процессор Intel Core i7-14700K LGA1700 BOX',
-                'price' => 9500.00, 'quantity' => 8, 'category_id' => $categories['components-cpu']->id, 'brand_id' => $brands['intel']->id, 'is_new' => true,
-                'thumbnail_url' => 'https://placehold.co/600x600/008080/FFFFFF?text=i7-14700K',
-                'description' => 'Новейший процессор Intel Core i7 14-го поколения для высокой производительности.',
-                'attributes_map' => [
-                    'cpu_series' => 'Intel Core i7', 'cpu_model' => '14700K', 'cpu_cores' => 20, // 8P + 12E
-                    'ram_type' => 'DDR5/DDR4', 'gpu_type' => 'Интегрированная Intel UHD Graphics 770',
-                    'warranty' => 36, 'material' => 'OEM Box'
-                ]
-            ],
-            [
-                'name' => 'Видеокарта ASUS ROG Strix GeForce RTX 4070 Ti SUPER OC 16GB',
-                'price' => 23500.00, 'quantity' => 5, 'category_id' => $categories['components-gpu']->id, 'brand_id' => $brands['asusrog']->id, 'is_featured' => true,
-                'thumbnail_url' => 'https://placehold.co/600x600/4B0082/FFFFFF?text=RTX+4070TiS',
-                'description' => 'Мощная видеокарта для игр в 4K с трассировкой лучей.',
-                'attributes_map' => [
-                    'gpu_manufacturer' => 'NVIDIA', 'gpu_model' => 'GeForce RTX 4070 Ti SUPER OC',
-                    'gpu_memory' => 16, 'ram_type' => 'GDDR6X', // Video RAM type
-                    'ports_video' => '3x DisplayPort 1.4a, 2x HDMI 2.1',
-                    'warranty' => 36, 'dimensions' => '336 x 150 x 63 мм'
-                ]
-            ],
+            // Laptops (12)
+            ['name' => 'Apple MacBook Air 13" M2, 8GB, 256GB SSD, Space Gray', 'price' => 22999.00, 'quantity' => 10, 'category_id' => $categories['ultrabooks']->id, 'brand_id' => $brands['apple']->id, 'is_new' => true, 'thumbnail_url' => 'https://placehold.co/600x600/D3D3D3/000000?text=MacBook+Air+M2', 'images' => ['https://placehold.co/800x800/D3D3D3/000000?text=MacBook+Air+M2'], 'description' => 'Ультратонкий и легкий MacBook Air с мощным чипом M2.', 'attributes_map' => ['screen_size' => 13.6, 'resolution' => '2560x1664', 'matrix_type' => 'IPS', 'ram_size' => 8, 'ram_type' => 'Unified', 'cpu_series' => 'Apple M2', 'cpu_cores' => 8, 'gpu_model' => '8-core GPU', 'storage_type' => 'SSD', 'ssd_volume' => 256, 'os_type' => 'macOS', 'color' => 'Серый космос', 'warranty' => 12]],
+            ['name' => 'ASUS ROG Strix SCAR 17, Ryzen 9, 32GB, 2TB SSD, RTX 4090', 'price' => 75990.00, 'quantity' => 3, 'category_id' => $categories['gaming-laptops']->id, 'brand_id' => $brands['asusrog']->id, 'is_featured' => true, 'thumbnail_url' => 'https://placehold.co/600x600/E4000F/FFFFFF?text=ROG+Strix+SCAR', 'images' => ['https://placehold.co/800x800/E4000F/FFFFFF?text=ROG+Strix+SCAR'], 'description' => 'Максимальная производительность для киберспорта.', 'attributes_map' => ['screen_size' => 17.3, 'resolution' => '2560x1440', 'matrix_type' => 'IPS', 'refresh_rate' => 240, 'ram_size' => 32, 'ram_type' => 'DDR5', 'cpu_series' => 'AMD Ryzen 9', 'cpu_cores' => 16, 'storage_type' => 'SSD', 'ssd_volume' => 2000, 'gpu_model' => 'GeForce RTX 4090', 'gpu_memory' => 16, 'os_type' => 'Windows 11', 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'Lenovo Legion 5 Pro, Intel i7, 16GB, 1TB SSD, RTX 3070Ti', 'price' => 35500.00, 'quantity' => 8, 'category_id' => $categories['gaming-laptops']->id, 'brand_id' => $brands['lenovo']->id, 'thumbnail_url' => 'https://placehold.co/600x600/4A4A4A/FFFFFF?text=Legion+5+Pro', 'images' => ['https://placehold.co/800x800/4A4A4A/FFFFFF?text=Legion+5+Pro'], 'description' => 'Сбалансированный игровой ноутбук с отличным экраном.', 'attributes_map' => ['screen_size' => 16.0, 'resolution' => '2560x1600', 'matrix_type' => 'IPS', 'refresh_rate' => 165, 'ram_size' => 16, 'ram_type' => 'DDR5', 'cpu_series' => 'Intel Core i7', 'cpu_cores' => 14, 'storage_type' => 'SSD', 'ssd_volume' => 1024, 'gpu_model' => 'GeForce RTX 3070 Ti', 'gpu_memory' => 8, 'os_type' => 'Без ОС', 'color' => 'Серый', 'warranty' => 12]],
+            ['name' => 'MSI Katana 15 B12V, i7-12650H, 16GB, 512GB SSD, RTX 4060', 'price' => 28900.00, 'quantity' => 11, 'category_id' => $categories['gaming-laptops']->id, 'brand_id' => $brands['msi']->id, 'thumbnail_url' => 'https://placehold.co/600x600/DA291C/FFFFFF?text=MSI+Katana+15', 'images' => ['https://placehold.co/800x800/DA291C/FFFFFF?text=MSI+Katana+15'], 'description' => 'Современный игровой ноутбук с видеокартой RTX 40-й серии.', 'attributes_map' => ['screen_size' => 15.6, 'resolution' => '1920x1080', 'matrix_type' => 'IPS', 'refresh_rate' => 144, 'ram_size' => 16, 'ram_type' => 'DDR5', 'cpu_series' => 'Intel Core i7', 'cpu_cores' => 10, 'storage_type' => 'SSD', 'ssd_volume' => 512, 'gpu_model' => 'GeForce RTX 4060', 'gpu_memory' => 8, 'os_type' => 'Без ОС', 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'Acer Nitro 5 AN515, Ryzen 5, 16GB, 512GB SSD, RTX 3050Ti', 'price' => 21500.00, 'quantity' => 15, 'category_id' => $categories['gaming-laptops']->id, 'brand_id' => $brands['acer']->id, 'thumbnail_url' => 'https://placehold.co/600x600/FF0000/FFFFFF?text=Acer+Nitro+5', 'images' => ['https://placehold.co/800x800/FF0000/FFFFFF?text=Acer+Nitro+5'], 'description' => 'Доступный игровой ноутбук для популярных онлайн-игр.', 'attributes_map' => ['screen_size' => 15.6, 'resolution' => '1920x1080', 'matrix_type' => 'IPS', 'refresh_rate' => 144, 'ram_size' => 16, 'ram_type' => 'DDR4', 'cpu_series' => 'AMD Ryzen 5', 'cpu_cores' => 6, 'storage_type' => 'SSD', 'ssd_volume' => 512, 'gpu_model' => 'GeForce RTX 3050 Ti', 'gpu_memory' => 4, 'os_type' => 'Без ОС', 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'Dell XPS 15 9530, i9-13900H, 32GB, 1TB SSD, RTX 4070', 'price' => 68000.00, 'quantity' => 5, 'category_id' => $categories['ultrabooks']->id, 'brand_id' => $brands['dell']->id, 'is_featured' => true, 'thumbnail_url' => 'https://placehold.co/600x600/CCCCCC/000000?text=Dell+XPS+15', 'images' => ['https://placehold.co/800x800/CCCCCC/000000?text=Dell+XPS+15'], 'description' => 'Премиальный ультрабук для создателей контента с OLED-экраном.', 'attributes_map' => ['screen_size' => 15.6, 'resolution' => '3456x2160', 'matrix_type' => 'OLED', 'ram_size' => 32, 'ram_type' => 'DDR5', 'cpu_series' => 'Intel Core i9', 'cpu_cores' => 14, 'storage_type' => 'SSD', 'ssd_volume' => 1024, 'gpu_model' => 'GeForce RTX 4070', 'gpu_memory' => 8, 'os_type' => 'Windows 11 Pro', 'color' => 'Серебристый', 'warranty' => 24]],
+            ['name' => 'HP Spectre x360 14, Core Ultra 7, 16GB, 1TB SSD', 'price' => 42000.00, 'quantity' => 7, 'category_id' => $categories['ultrabooks']->id, 'brand_id' => $brands['hp']->id, 'thumbnail_url' => 'https://placehold.co/600x600/003F6A/FFFFFF?text=HP+Spectre+x360', 'images' => ['https://placehold.co/800x800/003F6A/FFFFFF?text=HP+Spectre+x360'], 'description' => 'Ноутбук-трансформер с сенсорным экраном и стилусом.', 'attributes_map' => ['screen_size' => 14.0, 'resolution' => '2880x1800', 'matrix_type' => 'OLED', 'ram_size' => 16, 'ram_type' => 'LPDDR5', 'cpu_series' => 'Intel Core Ultra 7', 'cpu_cores' => 16, 'storage_type' => 'SSD', 'ssd_volume' => 1024, 'gpu_model' => 'Intel Arc Graphics', 'os_type' => 'Windows 11', 'color' => 'Синий', 'warranty' => 12]],
+            ['name' => 'Lenovo Yoga Slim 7, Ryzen 7, 16GB, 1TB SSD', 'price' => 25500.00, 'quantity' => 14, 'category_id' => $categories['ultrabooks']->id, 'brand_id' => $brands['lenovo']->id, 'thumbnail_url' => 'https://placehold.co/600x600/50C878/FFFFFF?text=Yoga+Slim+7', 'images' => ['https://placehold.co/800x800/50C878/FFFFFF?text=Yoga+Slim+7'], 'description' => 'Тонкий и легкий ноутбук с длительным временем работы.', 'attributes_map' => ['screen_size' => 14.0, 'resolution' => '2880x1800', 'matrix_type' => 'OLED', 'refresh_rate' => 90, 'ram_size' => 16, 'ram_type' => 'LPDDR5', 'cpu_series' => 'AMD Ryzen 7', 'cpu_cores' => 8, 'storage_type' => 'SSD', 'ssd_volume' => 1024, 'gpu_model' => 'AMD Radeon Graphics', 'os_type' => 'Windows 11', 'color' => 'Бирюзовый', 'warranty' => 12]],
+            ['name' => 'ASUS Zenbook 14 OLED, Core Ultra 5, 16GB, 512GB SSD', 'price' => 29800.00, 'quantity' => 9, 'category_id' => $categories['ultrabooks']->id, 'brand_id' => $brands['asus']->id, 'is_new' => true, 'thumbnail_url' => 'https://placehold.co/600x600/00529B/FFFFFF?text=Zenbook+14', 'images' => ['https://placehold.co/800x800/00529B/FFFFFF?text=Zenbook+14'], 'description' => 'Современный ультрабук с ярким OLED-дисплеем и процессором Meteor Lake.', 'attributes_map' => ['screen_size' => 14.0, 'resolution' => '1920x1200', 'matrix_type' => 'OLED', 'ram_size' => 16, 'ram_type' => 'LPDDR5X', 'cpu_series' => 'Intel Core Ultra 5', 'cpu_cores' => 12, 'storage_type' => 'SSD', 'ssd_volume' => 512, 'gpu_model' => 'Intel Arc Graphics', 'os_type' => 'Windows 11', 'color' => 'Темно-синий', 'warranty' => 24]],
+            ['name' => 'Razer Blade 16, i9-14900HX, 32GB, 2TB SSD, RTX 4090', 'price' => 98000.00, 'quantity' => 2, 'category_id' => $categories['gaming-laptops']->id, 'brand_id' => $brands['razer']->id, 'thumbnail_url' => 'https://placehold.co/600x600/00FF00/000000?text=Razer+Blade+16', 'images' => ['https://placehold.co/800x800/00FF00/000000?text=Razer+Blade+16'], 'description' => 'Бескомпромиссный игровой ноутбук в стильном алюминиевом корпусе.', 'attributes_map' => ['screen_size' => 16.0, 'resolution' => '3840x2400', 'matrix_type' => 'Mini-LED', 'refresh_rate' => 120, 'ram_size' => 32, 'ram_type' => 'DDR5', 'cpu_series' => 'Intel Core i9', 'cpu_cores' => 24, 'storage_type' => 'SSD', 'ssd_volume' => 2048, 'gpu_model' => 'GeForce RTX 4090', 'gpu_memory' => 16, 'os_type' => 'Windows 11', 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'Acer Swift Go 14, Core Ultra 7, 16GB, 1TB SSD', 'price' => 27500.00, 'quantity' => 10, 'category_id' => $categories['laptops-notebooks']->id, 'brand_id' => $brands['acer']->id, 'thumbnail_url' => 'https://placehold.co/600x600/87CEEB/000000?text=Acer+Swift+Go', 'images' => ['https://placehold.co/800x800/87CEEB/000000?text=Acer+Swift+Go'], 'description' => 'Универсальный ноутбук для работы и учебы с отличным экраном.', 'attributes_map' => ['screen_size' => 14.0, 'resolution' => '2880x1800', 'matrix_type' => 'OLED', 'ram_size' => 16, 'ram_type' => 'LPDDR5X', 'cpu_series' => 'Intel Core Ultra 7', 'cpu_cores' => 16, 'storage_type' => 'SSD', 'ssd_volume' => 1024, 'gpu_model' => 'Intel Arc Graphics', 'os_type' => 'Windows 11', 'color' => 'Серебристый', 'warranty' => 12]],
+            ['name' => 'HP Pavilion 15, Ryzen 5, 8GB, 512GB SSD', 'price' => 15200.00, 'quantity' => 20, 'category_id' => $categories['laptops-notebooks']->id, 'brand_id' => $brands['hp']->id, 'thumbnail_url' => 'https://placehold.co/600x600/FFD700/000000?text=HP+Pavilion+15', 'images' => ['https://placehold.co/800x800/FFD700/000000?text=HP+Pavilion+15'], 'description' => 'Надежный ноутбук для повседневных задач и мультимедиа.', 'attributes_map' => ['screen_size' => 15.6, 'resolution' => '1920x1080', 'matrix_type' => 'IPS', 'ram_size' => 8, 'ram_type' => 'DDR4', 'cpu_series' => 'AMD Ryzen 5', 'cpu_cores' => 6, 'storage_type' => 'SSD', 'ssd_volume' => 512, 'gpu_model' => 'AMD Radeon Graphics', 'os_type' => 'Windows 11', 'color' => 'Золотой', 'warranty' => 12]],
+
+            // Headsets (8)
+            ['name' => 'SteelSeries Arctis Nova Pro Wireless', 'price' => 6800.00, 'quantity' => 10, 'category_id' => $categories['peripherals-headsets']->id, 'brand_id' => $brands['steelseries']->id, 'is_featured' => true, 'thumbnail_url' => 'https://placehold.co/600x600/FF5A00/FFFFFF?text=Arctis+Nova+Pro', 'images' => ['https://placehold.co/800x800/FF5A00/FFFFFF?text=Arctis+Nova+Pro'], 'description' => 'Беспроводная гарнитура премиум-класса с активным шумоподавлением.', 'attributes_map' => ['connection_type' => 'Беспроводное', 'headphone_type' => 'Полноразмерные', 'microphone_type' => 'Выдвижной', 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'Logitech G PRO X Wireless LIGHTSPEED', 'price' => 3900.00, 'quantity' => 15, 'category_id' => $categories['peripherals-headsets']->id, 'brand_id' => $brands['logitech']->id, 'thumbnail_url' => 'https://placehold.co/600x600/00B8FC/000000?text=Logitech+G+Pro+X', 'images' => ['https://placehold.co/800x800/00B8FC/000000?text=Logitech+G+Pro+X'], 'description' => 'Профессиональная игровая гарнитура, разработанная совместно с киберспортсменами.', 'attributes_map' => ['connection_type' => 'Беспроводное', 'headphone_type' => 'Полноразмерные', 'microphone_type' => 'Съемный', 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'Razer BlackShark V2 Pro', 'price' => 3500.00, 'quantity' => 12, 'category_id' => $categories['peripherals-headsets']->id, 'brand_id' => $brands['razer']->id, 'thumbnail_url' => 'https://placehold.co/600x600/00FF00/000000?text=BlackShark+V2+Pro', 'images' => ['https://placehold.co/800x800/00FF00/000000?text=BlackShark+V2+Pro'], 'description' => 'Легкая беспроводная гарнитура для соревновательных игр.', 'attributes_map' => ['connection_type' => 'Беспроводное', 'headphone_type' => 'Полноразмерные', 'microphone_type' => 'Съемный', 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'HyperX Cloud III Wireless', 'price' => 3200.00, 'quantity' => 20, 'category_id' => $categories['peripherals-headsets']->id, 'brand_id' => $brands['hyperx']->id, 'thumbnail_url' => 'https://placehold.co/600x600/ED1C24/FFFFFF?text=Cloud+III', 'images' => ['https://placehold.co/800x800/ED1C24/FFFFFF?text=Cloud+III'], 'description' => 'Новое поколение легендарной гарнитуры Cloud с улучшенным комфортом.', 'attributes_map' => ['connection_type' => 'Беспроводное', 'headphone_type' => 'Полноразмерные', 'microphone_type' => 'Съемный', 'color' => 'Черно-красный', 'warranty' => 24]],
+            ['name' => 'Corsair HS80 RGB Wireless', 'price' => 2900.00, 'quantity' => 18, 'category_id' => $categories['peripherals-headsets']->id, 'brand_id' => $brands['corsair']->id, 'thumbnail_url' => 'https://placehold.co/600x600/F0F0F0/000000?text=Corsair+HS80', 'images' => ['https://placehold.co/800x800/F0F0F0/000000?text=Corsair+HS80'], 'description' => 'Комфортная беспроводная гарнитура с поддержкой Dolby Atmos.', 'attributes_map' => ['connection_type' => 'Беспроводное', 'headphone_type' => 'Полноразмерные', 'microphone_type' => 'Несъемный', 'color' => 'Белый', 'warranty' => 24]],
+            ['name' => 'ASUS ROG Delta S Animate', 'price' => 4100.00, 'quantity' => 9, 'category_id' => $categories['peripherals-headsets']->id, 'brand_id' => $brands['asusrog']->id, 'thumbnail_url' => 'https://placehold.co/600x600/FF0036/FFFFFF?text=ROG+Delta+S', 'images' => ['https://placehold.co/800x800/FF0036/FFFFFF?text=ROG+Delta+S'], 'description' => 'Проводная гарнитура с ЦАП ESS 9281 и анимируемыми дисплеями на чашках.', 'attributes_map' => ['connection_type' => 'Проводное', 'headphone_type' => 'Полноразмерные', 'microphone_type' => 'Съемный', 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'Sony WH-1000XM5', 'price' => 7500.00, 'quantity' => 11, 'category_id' => $categories['peripherals-headsets']->id, 'brand_id' => $brands['sony']->id, 'thumbnail_url' => 'https://placehold.co/600x600/C0C0C0/000000?text=Sony+XM5', 'images' => ['https://placehold.co/800x800/C0C0C0/000000?text=Sony+XM5'], 'description' => 'Лучшие в классе наушники с шумоподавлением для музыки и звонков.', 'attributes_map' => ['connection_type' => 'Беспроводное', 'headphone_type' => 'Полноразмерные', 'microphone_type' => 'Встроенный', 'color' => 'Серебристый', 'warranty' => 12]],
+            ['name' => 'Apple AirPods Pro 2', 'price' => 4800.00, 'quantity' => 25, 'category_id' => $categories['peripherals-headsets']->id, 'brand_id' => $brands['apple']->id, 'thumbnail_url' => 'https://placehold.co/600x600/F5F5F7/000000?text=AirPods+Pro+2', 'images' => ['https://placehold.co/800x800/F5F5F7/000000?text=AirPods+Pro+2'], 'description' => 'Компактные беспроводные наушники с превосходным шумоподавлением.', 'attributes_map' => ['connection_type' => 'Беспроводное', 'headphone_type' => 'Внутриканальные', 'microphone_type' => 'Встроенный', 'color' => 'Белый', 'warranty' => 12]],
+
+            // Smartphones (8)
+            ['name' => 'Samsung Galaxy S24 Ultra 12/512GB Titanium Gray', 'price' => 28900.00, 'quantity' => 20, 'category_id' => $categories['smartfony']->id, 'brand_id' => $brands['samsung']->id, 'is_new' => true, 'thumbnail_url' => 'https://placehold.co/600x600/808080/FFFFFF?text=S24+Ultra', 'images' => ['https://placehold.co/800x800/808080/FFFFFF?text=S24+Ultra'], 'description' => 'Флагманский смартфон с Galaxy AI, титановым корпусом и лучшей камерой.', 'attributes_map' => ['screen_size' => 6.8, 'resolution' => '3120x1440', 'matrix_type' => 'Dynamic AMOLED 2X', 'ram_size' => 12, 'cpu_series' => 'Snapdragon 8 Gen 3', 'ssd_volume' => 512, 'os_type' => 'Android', 'battery_capacity' => 5000, 'color' => 'Титановый Серый', 'warranty' => 12]],
+            ['name' => 'Apple iPhone 15 Pro Max 256GB Natural Titanium', 'price' => 29500.00, 'quantity' => 18, 'category_id' => $categories['smartfony']->id, 'brand_id' => $brands['apple']->id, 'is_featured' => true, 'thumbnail_url' => 'https://placehold.co/600x600/BEBDB8/000000?text=iPhone+15+Pro', 'images' => ['https://placehold.co/800x800/BEBDB8/000000?text=iPhone+15+Pro'], 'description' => 'Новый iPhone с титановым дизайном, чипом A17 Pro и портом USB-C.', 'attributes_map' => ['screen_size' => 6.7, 'resolution' => '2796x1290', 'matrix_type' => 'Super Retina XDR', 'ram_size' => 8, 'cpu_series' => 'A17 Pro', 'ssd_volume' => 256, 'os_type' => 'iOS', 'battery_capacity' => 4422, 'color' => 'Натуральный титан', 'warranty' => 12]],
+            ['name' => 'Google Pixel 8 Pro 12/256GB Obsidian', 'price' => 21000.00, 'quantity' => 15, 'category_id' => $categories['smartfony']->id, 'brand_id' => $brands['google']->id, 'thumbnail_url' => 'https://placehold.co/600x600/2D2D2D/FFFFFF?text=Pixel+8+Pro', 'images' => ['https://placehold.co/800x800/2D2D2D/FFFFFF?text=Pixel+8+Pro'], 'description' => 'Смартфон с лучшей камерой на базе искусственного интеллекта и чистым Android.', 'attributes_map' => ['screen_size' => 6.7, 'resolution' => '2992x1344', 'matrix_type' => 'OLED', 'ram_size' => 12, 'cpu_series' => 'Google Tensor G3', 'ssd_volume' => 256, 'os_type' => 'Android', 'battery_capacity' => 5050, 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'Xiaomi 14 12/512GB Black', 'price' => 18500.00, 'quantity' => 22, 'category_id' => $categories['smartfony']->id, 'brand_id' => $brands['xiaomi']->id, 'thumbnail_url' => 'https://placehold.co/600x600/1C1C1E/FFFFFF?text=Xiaomi+14', 'images' => ['https://placehold.co/800x800/1C1C1E/FFFFFF?text=Xiaomi+14'], 'description' => 'Компактный флагман с оптикой Leica и сверхбыстрой зарядкой.', 'attributes_map' => ['screen_size' => 6.36, 'resolution' => '2670x1200', 'matrix_type' => 'AMOLED', 'ram_size' => 12, 'cpu_series' => 'Snapdragon 8 Gen 3', 'ssd_volume' => 512, 'os_type' => 'Android', 'battery_capacity' => 4610, 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'Samsung Galaxy A55 8/256GB Awesome Navy', 'price' => 8500.00, 'quantity' => 30, 'category_id' => $categories['smartfony']->id, 'brand_id' => $brands['samsung']->id, 'thumbnail_url' => 'https://placehold.co/600x600/000080/FFFFFF?text=Galaxy+A55', 'images' => ['https://placehold.co/800x800/000080/FFFFFF?text=Galaxy+A55'], 'description' => 'Народный хит. Отличный экран, влагозащита и премиальные материалы.', 'attributes_map' => ['screen_size' => 6.6, 'resolution' => '2340x1080', 'matrix_type' => 'Super AMOLED', 'ram_size' => 8, 'cpu_series' => 'Exynos 1480', 'ssd_volume' => 256, 'os_type' => 'Android', 'battery_capacity' => 5000, 'color' => 'Темно-синий', 'warranty' => 12]],
+            ['name' => 'ASUS ROG Phone 8 Pro 16/512GB', 'price' => 29000.00, 'quantity' => 7, 'category_id' => $categories['smartfony']->id, 'brand_id' => $brands['asusrog']->id, 'thumbnail_url' => 'https://placehold.co/600x600/333333/FFFFFF?text=ROG+Phone+8', 'images' => ['https://placehold.co/800x800/333333/FFFFFF?text=ROG+Phone+8'], 'description' => 'Ультимативный игровой смартфон с мощнейшим железом и системой охлаждения.', 'attributes_map' => ['screen_size' => 6.78, 'resolution' => '2400x1080', 'matrix_type' => 'AMOLED', 'ram_size' => 16, 'cpu_series' => 'Snapdragon 8 Gen 3', 'ssd_volume' => 512, 'os_type' => 'Android', 'battery_capacity' => 5500, 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'Apple iPhone 15 128GB Blue', 'price' => 19800.00, 'quantity' => 25, 'category_id' => $categories['smartfony']->id, 'brand_id' => $brands['apple']->id, 'thumbnail_url' => 'https://placehold.co/600x600/ADD8E6/000000?text=iPhone+15', 'images' => ['https://placehold.co/800x800/ADD8E6/000000?text=iPhone+15'], 'description' => 'Базовый iPhone с Dynamic Island, отличной камерой и чипом A16 Bionic.', 'attributes_map' => ['screen_size' => 6.1, 'resolution' => '2556x1179', 'matrix_type' => 'Super Retina XDR', 'ram_size' => 6, 'cpu_series' => 'A16 Bionic', 'ssd_volume' => 128, 'os_type' => 'iOS', 'battery_capacity' => 3349, 'color' => 'Голубой', 'warranty' => 12]],
+            ['name' => 'Xiaomi Redmi Note 13 Pro+ 5G 12/512GB Midnight Black', 'price' => 9200.00, 'quantity' => 28, 'category_id' => $categories['smartfony']->id, 'brand_id' => $brands['xiaomi']->id, 'thumbnail_url' => 'https://placehold.co/600x600/3B3B3B/FFFFFF?text=Redmi+Note+13+Pro', 'images' => ['https://placehold.co/800x800/3B3B3B/FFFFFF?text=Redmi+Note+13+Pro'], 'description' => 'Субфлагман с изогнутым экраном, камерой 200 Мп и быстрой зарядкой 120 Вт.', 'attributes_map' => ['screen_size' => 6.67, 'resolution' => '2712x1220', 'matrix_type' => 'AMOLED', 'ram_size' => 12, 'cpu_series' => 'MediaTek Dimensity 7200 Ultra', 'ssd_volume' => 512, 'os_type' => 'Android', 'battery_capacity' => 5000, 'color' => 'Черный', 'warranty' => 12]],
+
+            // Monitors (8)
+            ['name' => 'LG UltraGear 27GP850-B, 27" QHD Nano IPS 165Hz', 'price' => 8990.00, 'quantity' => 15, 'category_id' => $categories['monitory-dlya-pk']->id, 'brand_id' => $brands['lg']->id, 'is_featured' => true, 'thumbnail_url' => 'https://placehold.co/600x600/A50034/FFFFFF?text=LG+UltraGear', 'images' => ['https://placehold.co/800x800/A50034/FFFFFF?text=LG+UltraGear'], 'description' => 'Игровой монитор с Nano IPS матрицей и G-Sync Compatible.', 'attributes_map' => ['screen_size' => 27.0, 'resolution' => '2560x1440', 'matrix_type' => 'Nano IPS', 'refresh_rate' => 165, 'response_time' => 1, 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'Samsung Odyssey G7 32" QHD 240Hz', 'price' => 13500.00, 'quantity' => 9, 'category_id' => $categories['monitory-dlya-pk']->id, 'brand_id' => $brands['samsung']->id, 'thumbnail_url' => 'https://placehold.co/600x600/00BFFF/000000?text=Odyssey+G7', 'images' => ['https://placehold.co/800x800/00BFFF/000000?text=Odyssey+G7'], 'description' => 'Изогнутый игровой монитор с высокой частотой обновления.', 'attributes_map' => ['screen_size' => 32.0, 'resolution' => '2560x1440', 'matrix_type' => 'VA', 'refresh_rate' => 240, 'response_time' => 1, 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'Dell UltraSharp U2723QE 27" 4K IPS Black', 'price' => 15500.00, 'quantity' => 11, 'category_id' => $categories['monitory-dlya-pk']->id, 'brand_id' => $brands['dell']->id, 'thumbnail_url' => 'https://placehold.co/600x600/007DB8/FFFFFF?text=Dell+UltraSharp', 'images' => ['https://placehold.co/800x800/007DB8/FFFFFF?text=Dell+UltraSharp'], 'description' => 'Профессиональный 4K монитор для работы с цветом.', 'attributes_map' => ['screen_size' => 27.0, 'resolution' => '3840x2160', 'matrix_type' => 'IPS Black', 'refresh_rate' => 60, 'response_time' => 5, 'color' => 'Серебристый', 'warranty' => 36]],
+            ['name' => 'ASUS ProArt PA279CRV 27" 4K', 'price' => 14800.00, 'quantity' => 8, 'category_id' => $categories['monitory-dlya-pk']->id, 'brand_id' => $brands['asus']->id, 'thumbnail_url' => 'https://placehold.co/600x600/383838/FFFFFF?text=ASUS+ProArt', 'images' => ['https://placehold.co/800x800/383838/FFFFFF?text=ASUS+ProArt'], 'description' => 'Монитор для дизайнеров и фотографов с заводской калибровкой.', 'attributes_map' => ['screen_size' => 27.0, 'resolution' => '3840x2160', 'matrix_type' => 'IPS', 'refresh_rate' => 60, 'response_time' => 5, 'color' => 'Черный', 'warranty' => 36]],
+            ['name' => 'MSI MAG 274UPF 27" 4K 144Hz', 'price' => 12900.00, 'quantity' => 13, 'category_id' => $categories['monitory-dlya-pk']->id, 'brand_id' => $brands['msi']->id, 'thumbnail_url' => 'https://placehold.co/600x600/E53E3E/FFFFFF?text=MSI+MAG', 'images' => ['https://placehold.co/800x800/E53E3E/FFFFFF?text=MSI+MAG'], 'description' => 'Игровой 4K монитор с быстрой IPS-матрицей.', 'attributes_map' => ['screen_size' => 27.0, 'resolution' => '3840x2160', 'matrix_type' => 'Rapid IPS', 'refresh_rate' => 144, 'response_time' => 1, 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'Xiaomi Mi Curved Gaming Monitor 34" WQHD 144Hz', 'price' => 7800.00, 'quantity' => 20, 'category_id' => $categories['monitory-dlya-pk']->id, 'brand_id' => $brands['xiaomi']->id, 'thumbnail_url' => 'https://placehold.co/600x600/FF6900/FFFFFF?text=Xiaomi+Monitor', 'images' => ['https://placehold.co/800x800/FF6900/FFFFFF?text=Xiaomi+Monitor'], 'description' => 'Широкоформатный изогнутый монитор для полного погружения в игры.', 'attributes_map' => ['screen_size' => 34.0, 'resolution' => '3440x1440', 'matrix_type' => 'VA', 'refresh_rate' => 144, 'response_time' => 4, 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'Gigabyte M32U 31.5" 4K 144Hz', 'price' => 16500.00, 'quantity' => 7, 'category_id' => $categories['monitory-dlya-pk']->id, 'brand_id' => $brands['gigabyte']->id, 'thumbnail_url' => 'https://placehold.co/600x600/FF6400/FFFFFF?text=Gigabyte+M32U', 'images' => ['https://placehold.co/800x800/FF6400/FFFFFF?text=Gigabyte+M32U'], 'description' => 'Большой игровой 4K-монитор со встроенным KVM-переключателем.', 'attributes_map' => ['screen_size' => 31.5, 'resolution' => '3840x2160', 'matrix_type' => 'IPS', 'refresh_rate' => 144, 'response_time' => 1, 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'BenQ GW2480 23.8" FHD IPS', 'price' => 2800.00, 'quantity' => 25, 'category_id' => $categories['monitory-dlya-pk']->id, 'brand_id' => Brand::firstOrCreate(['slug' => 'benq'], ['name' => 'BenQ'])->id, 'thumbnail_url' => 'https://placehold.co/600x600/EE3224/FFFFFF?text=BenQ+GW2480', 'images' => ['https://placehold.co/800x800/EE3224/FFFFFF?text=BenQ+GW2480'], 'description' => 'Надежный офисный монитор с технологией защиты зрения.', 'attributes_map' => ['screen_size' => 23.8, 'resolution' => '1920x1080', 'matrix_type' => 'IPS', 'refresh_rate' => 60, 'response_time' => 5, 'color' => 'Черный', 'warranty' => 24]],
+
+            // TVs (8)
+            ['name' => 'Samsung QE65QN90C 65" Neo QLED 4K', 'price' => 35000.00, 'quantity' => 8, 'category_id' => $categories['televizory']->id, 'brand_id' => $brands['samsung']->id, 'is_featured' => true, 'thumbnail_url' => 'https://placehold.co/600x600/0057B8/FFFFFF?text=Samsung+Neo+QLED', 'images' => ['https://placehold.co/800x800/0057B8/FFFFFF?text=Samsung+Neo+QLED'], 'description' => 'Яркий 4K телевизор с технологией Mini-LED и антибликовым покрытием.', 'attributes_map' => ['screen_size' => 65.0, 'resolution' => '3840x2160', 'matrix_type' => 'Neo QLED', 'refresh_rate' => 120, 'smart_tv_platform' => 'Tizen', 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'LG OLED65C3 65" OLED evo 4K', 'price' => 42000.00, 'quantity' => 6, 'category_id' => $categories['televizory']->id, 'brand_id' => $brands['lg']->id, 'thumbnail_url' => 'https://placehold.co/600x600/D9002D/FFFFFF?text=LG+OLED+C3', 'images' => ['https://placehold.co/800x800/D9002D/FFFFFF?text=LG+OLED+C3'], 'description' => 'Телевизор с идеальным черным цветом и высокой контрастностью.', 'attributes_map' => ['screen_size' => 65.0, 'resolution' => '3840x2160', 'matrix_type' => 'OLED', 'refresh_rate' => 120, 'smart_tv_platform' => 'webOS', 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'Sony XR-55A95L 55" QD-OLED 4K', 'price' => 55000.00, 'quantity' => 4, 'category_id' => $categories['televizory']->id, 'brand_id' => $brands['sony']->id, 'thumbnail_url' => 'https://placehold.co/600x600/303030/FFFFFF?text=Sony+QD-OLED', 'images' => ['https://placehold.co/800x800/303030/FFFFFF?text=Sony+QD-OLED'], 'description' => 'Телевизор премиум-класса с технологией QD-OLED для непревзойденного качества изображения.', 'attributes_map' => ['screen_size' => 55.0, 'resolution' => '3840x2160', 'matrix_type' => 'QD-OLED', 'refresh_rate' => 120, 'smart_tv_platform' => 'Google TV', 'color' => 'Черный', 'warranty' => 24]],
+            ['name' => 'Xiaomi TV A2 55" 4K', 'price' => 9800.00, 'quantity' => 20, 'category_id' => $categories['televizory']->id, 'brand_id' => $brands['xiaomi']->id, 'thumbnail_url' => 'https://placehold.co/600x600/F56600/FFFFFF?text=Xiaomi+TV+A2', 'images' => ['https://placehold.co/800x800/F56600/FFFFFF?text=Xiaomi+TV+A2'], 'description' => 'Доступный 4K телевизор на Android TV с тонким металлическим корпусом.', 'attributes_map' => ['screen_size' => 55.0, 'resolution' => '3840x2160', 'matrix_type' => 'LED', 'refresh_rate' => 60, 'smart_tv_platform' => 'Android TV', 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'LG 43UQ75006LG 43" LED 4K', 'price' => 7500.00, 'quantity' => 25, 'category_id' => $categories['televizory']->id, 'brand_id' => $brands['lg']->id, 'thumbnail_url' => 'https://placehold.co/600x600/A50034/FFFFFF?text=LG+43+UQ75', 'images' => ['https://placehold.co/800x800/A50034/FFFFFF?text=LG+43+UQ75'], 'description' => 'Компактный 4K телевизор для спальни или кухни с быстрым Smart TV.', 'attributes_map' => ['screen_size' => 43.0, 'resolution' => '3840x2160', 'matrix_type' => 'LED', 'refresh_rate' => 60, 'smart_tv_platform' => 'webOS', 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'Samsung The Frame QE50LS03B 50" QLED 4K', 'price' => 21000.00, 'quantity' => 10, 'category_id' => $categories['televizory']->id, 'brand_id' => $brands['samsung']->id, 'thumbnail_url' => 'https://placehold.co/600x600/EAE7DC/000000?text=The+Frame', 'images' => ['https://placehold.co/800x800/EAE7DC/000000?text=The+Frame'], 'description' => 'Интерьерный телевизор, который в выключенном состоянии показывает картины.', 'attributes_map' => ['screen_size' => 50.0, 'resolution' => '3840x2160', 'matrix_type' => 'QLED', 'refresh_rate' => 60, 'smart_tv_platform' => 'Tizen', 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'Sony BRAVIA 9 75" Mini LED 4K', 'price' => 78000.00, 'quantity' => 3, 'category_id' => $categories['televizory']->id, 'brand_id' => $brands['sony']->id, 'is_new' => true, 'thumbnail_url' => 'https://placehold.co/600x600/505050/FFFFFF?text=Sony+BRAVIA+9', 'images' => ['https://placehold.co/800x800/505050/FFFFFF?text=Sony+BRAVIA+9'], 'description' => 'Флагманский телевизор 2024 года с рекордной яркостью и контрастностью.', 'attributes_map' => ['screen_size' => 75.0, 'resolution' => '3840x2160', 'matrix_type' => 'Mini-LED', 'refresh_rate' => 120, 'smart_tv_platform' => 'Google TV', 'color' => 'Темно-серый', 'warranty' => 24]],
+            ['name' => 'LG StanbyME 27"', 'price' => 18000.00, 'quantity' => 5, 'category_id' => $categories['televizory']->id, 'brand_id' => $brands['lg']->id, 'thumbnail_url' => 'https://placehold.co/600x600/F0EAD6/000000?text=LG+StanbyME', 'images' => ['https://placehold.co/800x800/F0EAD6/000000?text=LG+StanbyME'], 'description' => 'Уникальный беспроводной телевизор на колесиках с сенсорным экраном.', 'attributes_map' => ['screen_size' => 27.0, 'resolution' => '1920x1080', 'matrix_type' => 'IPS', 'refresh_rate' => 60, 'smart_tv_platform' => 'webOS', 'color' => 'Белый', 'warranty' => 12]],
+
+            // Tablets (8)
+            ['name' => 'Apple iPad Pro 11" M4 256GB Wi-Fi Space Black', 'price' => 25000.00, 'quantity' => 12, 'category_id' => $categories['tablets']->id, 'brand_id' => $brands['apple']->id, 'is_new' => true, 'thumbnail_url' => 'https://placehold.co/600x600/1D1D1F/FFFFFF?text=iPad+Pro+M4', 'images' => ['https://placehold.co/800x800/1D1D1F/FFFFFF?text=iPad+Pro+M4'], 'description' => 'Невероятно тонкий и мощный планшет с революционным Tandem OLED экраном.', 'attributes_map' => ['screen_size' => 11.0, 'resolution' => '2420x1668', 'matrix_type' => 'OLED', 'cpu_series' => 'Apple M4', 'ssd_volume' => 256, 'os_type' => 'iPadOS', 'network_support' => 'Wi-Fi', 'color' => 'Черный космос', 'warranty' => 12]],
+            ['name' => 'Samsung Galaxy Tab S9 Ultra 12/512GB Wi-Fi Graphite', 'price' => 26500.00, 'quantity' => 9, 'category_id' => $categories['tablets']->id, 'brand_id' => $brands['samsung']->id, 'thumbnail_url' => 'https://placehold.co/600x600/4A4A4A/FFFFFF?text=Tab+S9+Ultra', 'images' => ['https://placehold.co/800x800/4A4A4A/FFFFFF?text=Tab+S9+Ultra'], 'description' => 'Огромный и производительный планшет для работы и развлечений с защитой от воды.', 'attributes_map' => ['screen_size' => 14.6, 'resolution' => '2960x1848', 'matrix_type' => 'Dynamic AMOLED 2X', 'cpu_series' => 'Snapdragon 8 Gen 2', 'ssd_volume' => 512, 'os_type' => 'Android', 'network_support' => 'Wi-Fi', 'color' => 'Графит', 'warranty' => 12]],
+            ['name' => 'Xiaomi Pad 6 8/256GB Gravity Gray', 'price' => 7800.00, 'quantity' => 25, 'category_id' => $categories['tablets']->id, 'brand_id' => $brands['xiaomi']->id, 'thumbnail_url' => 'https://placehold.co/600x600/808080/FFFFFF?text=Xiaomi+Pad+6', 'images' => ['https://placehold.co/800x800/808080/FFFFFF?text=Xiaomi+Pad+6'], 'description' => 'Сбалансированный планшет с экраном 144 Гц и металлическим корпусом.', 'attributes_map' => ['screen_size' => 11.0, 'resolution' => '2880x1800', 'matrix_type' => 'IPS', 'cpu_series' => 'Snapdragon 870', 'ssd_volume' => 256, 'os_type' => 'Android', 'network_support' => 'Wi-Fi', 'color' => 'Серый', 'warranty' => 12]],
+            ['name' => 'Lenovo Tab P12 8/128GB Storm Grey', 'price' => 8200.00, 'quantity' => 18, 'category_id' => $categories['tablets']->id, 'brand_id' => $brands['lenovo']->id, 'thumbnail_url' => 'https://placehold.co/600x600/778899/FFFFFF?text=Lenovo+Tab+P12', 'images' => ['https://placehold.co/800x800/778899/FFFFFF?text=Lenovo+Tab+P12'], 'description' => 'Планшет с большим 3K экраном и акустикой JBL для просмотра фильмов.', 'attributes_map' => ['screen_size' => 12.7, 'resolution' => '2944x1840', 'matrix_type' => 'IPS', 'cpu_series' => 'MediaTek Dimensity 7050', 'ssd_volume' => 128, 'os_type' => 'Android', 'network_support' => 'Wi-Fi', 'color' => 'Серый', 'warranty' => 12]],
+            ['name' => 'Apple iPad Air 13" M2 128GB Wi-Fi Blue', 'price' => 18500.00, 'quantity' => 15, 'category_id' => $categories['tablets']->id, 'brand_id' => $brands['apple']->id, 'thumbnail_url' => 'https://placehold.co/600x600/A0D6E8/000000?text=iPad+Air+M2', 'images' => ['https://placehold.co/800x800/A0D6E8/000000?text=iPad+Air+M2'], 'description' => 'Теперь с большим экраном 13 дюймов и мощью чипа M2.', 'attributes_map' => ['screen_size' => 13.0, 'resolution' => '2732x2048', 'matrix_type' => 'IPS', 'cpu_series' => 'Apple M2', 'ssd_volume' => 128, 'os_type' => 'iPadOS', 'network_support' => 'Wi-Fi', 'color' => 'Голубой', 'warranty' => 12]],
+            ['name' => 'Samsung Galaxy Tab S9 FE+ 8/128GB Wi-Fi Mint', 'price' => 13500.00, 'quantity' => 20, 'category_id' => $categories['tablets']->id, 'brand_id' => $brands['samsung']->id, 'thumbnail_url' => 'https://placehold.co/600x600/98FF98/000000?text=Tab+S9+FE%2B', 'images' => ['https://placehold.co/800x800/98FF98/000000?text=Tab+S9+FE%2B'], 'description' => 'Доступная версия флагманского планшета с большим экраном и стилусом в комплекте.', 'attributes_map' => ['screen_size' => 12.4, 'resolution' => '2560x1600', 'matrix_type' => 'IPS', 'cpu_series' => 'Exynos 1380', 'ssd_volume' => 128, 'os_type' => 'Android', 'network_support' => 'Wi-Fi', 'color' => 'Мятный', 'warranty' => 12]],
+            ['name' => 'Razer Edge Wi-Fi', 'price' => 9500.00, 'quantity' => 8, 'category_id' => $categories['tablets']->id, 'brand_id' => $brands['razer']->id, 'thumbnail_url' => 'https://placehold.co/600x600/44D62C/000000?text=Razer+Edge', 'images' => ['https://placehold.co/800x800/44D62C/000000?text=Razer+Edge'], 'description' => 'Портативная игровая консоль на Android с AMOLED-экраном 144 Гц.', 'attributes_map' => ['screen_size' => 6.8, 'resolution' => '2400x1080', 'matrix_type' => 'AMOLED', 'cpu_series' => 'Snapdragon G3x Gen 1', 'ssd_volume' => 128, 'os_type' => 'Android', 'network_support' => 'Wi-Fi', 'color' => 'Черный', 'warranty' => 12]],
+            ['name' => 'Apple iPad 10.9 10th Gen 64GB Wi-Fi Silver', 'price' => 9900.00, 'quantity' => 22, 'category_id' => $categories['tablets']->id, 'brand_id' => $brands['apple']->id, 'thumbnail_url' => 'https://placehold.co/600x600/EAEAEA/000000?text=iPad+10th+Gen', 'images' => ['https://placehold.co/800x800/EAEAEA/000000?text=iPad+10th+Gen'], 'description' => 'Базовый iPad в современном дизайне с большим экраном и портом USB-C.', 'attributes_map' => ['screen_size' => 10.9, 'resolution' => '2360x1640', 'matrix_type' => 'IPS', 'cpu_series' => 'A14 Bionic', 'ssd_volume' => 64, 'os_type' => 'iPadOS', 'network_support' => 'Wi-Fi', 'color' => 'Серебристый', 'warranty' => 12]],
         ];
+
 
         $allDbAttributes = Attribute::all()->keyBy('slug');
 
         foreach ($productsDataArray as $productData) {
             $productAttributesToSave = $productData['attributes_map'] ?? [];
             unset($productData['attributes_map']);
-            unset($productData['specifications']);
 
             if (isset($productData['images']) && is_array($productData['images'])) {
                 $productData['images'] = json_encode($productData['images']);
-            } elseif (!isset($productData['images'])) {
-                $productData['images'] = $defaultProductAttributes['images'];
             }
-            if (!isset($productData['thumbnail_url'])) {
-                $productData['thumbnail_url'] = $defaultProductAttributes['thumbnail_url'];
-            }
-
             $finalProductData = array_merge($defaultProductAttributes, $productData);
 
             if (empty($finalProductData['sku'])) $finalProductData['sku'] = Str::upper(Str::random(4) . '-' . Str::random(6));
@@ -208,33 +169,21 @@ class ProductSeeder extends Seeder
             if (empty($finalProductData['meta_description'])) $finalProductData['meta_description'] = 'Купить ' . $finalProductData['name'] . '. ' . Str::limit(strip_tags($finalProductData['description'] ?? ''), 150);
 
             $slug = Str::slug($finalProductData['name'], '-');
-            $originalSlug = $slug; $count = 1;
+            $originalSlug = $slug;
+            $count = 1;
             while (Product::where('slug', $slug)->where('id', '!=', ($finalProductData['id'] ?? null))->exists()) {
                 $slug = $originalSlug . '-' . $count++;
             }
             $finalProductData['slug'] = $slug;
-
             $createdProduct = Product::updateOrCreate(['slug' => $finalProductData['slug']], $finalProductData);
 
             if ($createdProduct && !empty($productAttributesToSave)) {
-                foreach ($productAttributesToSave as $specNameOrSlug => $attributeData) {
-                    $attributeSlug = is_array($attributeData) ? ($attributeData['slug'] ?? null) : $specNameOrSlug;
-                    $attributeValue = is_array($attributeData) ? ($attributeData['value'] ?? null) : $attributeData;
-
-                    if (!$attributeSlug) {
-                        Log::warning("Missing slug for spec '{$specNameOrSlug}' on product '{$createdProduct->name}'.");
-                        continue;
-                    }
+                foreach ($productAttributesToSave as $attributeSlug => $attributeValue) {
 
                     if (isset($allDbAttributes[$attributeSlug])) {
                         $dbAttribute = $allDbAttributes[$attributeSlug];
 
-                        if ($attributeSlug === 'ssd_volume_tb' && isset($allDbAttributes['ssd_volume'])) {
-                            $dbAttribute = $allDbAttributes['ssd_volume'];
-                            $attributeValue = (is_numeric($attributeValue)) ? (float)$attributeValue * 1000 : null;
-                        }
-
-                        if ($attributeValue !== null && (is_string($attributeValue) ? trim($attributeValue) !== '' : true) ) {
+                        if ($attributeValue !== null && (is_string($attributeValue) ? trim($attributeValue) !== '' : true)) {
                             $pav = ProductAttributeValue::updateOrCreate(
                                 ['product_id' => $createdProduct->id, 'attribute_id' => $dbAttribute->id],
                                 []
@@ -244,7 +193,7 @@ class ProductSeeder extends Seeder
                             $pav->save();
                         }
                     } else {
-                        $this->command->warn("Attribute with slug '{$attributeSlug}' not found in DB for product '{$createdProduct->name}'. Spec name was '{$specNameOrSlug}'. Ensure this attribute is defined in AttributeSeeder.");
+                        $this->command->warn("Attribute with slug '{$attributeSlug}' not found in DB for product '{$createdProduct->name}'. Ensure this attribute is defined in AttributeSeeder.");
                     }
                 }
             }

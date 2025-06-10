@@ -2,20 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Product; // <-- Важно: импортируем модель Product
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Атрибуты, которые можно массово назначать.
      */
     protected $fillable = [
         'name',
@@ -24,9 +21,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Атрибуты, которые должны быть скрыты при сериализации.
      */
     protected $hidden = [
         'password',
@@ -34,9 +29,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Атрибуты, которые должны быть преобразованы.
      */
     protected function casts(): array
     {
@@ -45,4 +38,18 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // --- НАЧАЛО ВОССТАНОВЛЕННОГО КОДА ---
+
+    /**
+     * Определяет отношение "многие-ко-многим" с моделью Product.
+     * Этот метод позволяет получать все товары, которые пользователь добавил в "Избранное".
+     */
+    public function favorites()
+    {
+        // Указываем, что User связан с Product через таблицу 'favorite_product'
+        return $this->belongsToMany(Product::class, 'favorite_product');
+    }
+
+    // --- КОНЕЦ ВОССТАНОВЛЕННОГО КОДА ---
 }

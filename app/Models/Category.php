@@ -19,7 +19,7 @@ class Category extends Model
         'parent_id',
         'is_visible',
     ];
-    // In app/Models/Category.php
+    
     public function getSelfAndVisibleDescendantsIds(): array
     {
         $ids = [$this->id];

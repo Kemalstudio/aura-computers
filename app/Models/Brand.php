@@ -17,7 +17,6 @@ class Brand extends Model
         'is_visible',
     ];
 
-    // Отношение: бренд может иметь много товаров (определим позже)
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);

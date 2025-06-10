@@ -62,14 +62,11 @@ return new class extends Migration
             $table->json('specifications')->nullable();
 
             $table->timestamps();
-        }); // Закрыта скобка анонимной функции
-    } // <--- ВОТ ЭТА ЗАКРЫВАЮЩАЯ СКОБКА ДЛЯ МЕТОДА up() БЫЛА ПРОПУЩЕНА
+        }); 
+    } 
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
-    { // Открыта скобка метода down()
+    { 
         Schema::dropIfExists('products');
-    } // Закрыта скобка метода down()
-}; // Закрыта скобка класса
+    } 
+}; 
