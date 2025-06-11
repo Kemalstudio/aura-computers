@@ -194,17 +194,24 @@
 
                 <form class="d-flex mx-auto my-2 my-lg-0" role="search" style="width: 100%; max-width: 450px;">
                     <input class="form-control me-2" type="search" placeholder="Поиск товаров..." aria-label="Search">
-                    <button class="btn btn-outline-primary flex-shrink-0" type="submit"><i class="bi bi-search"></i></button>
+                    <button class="btn btn-outline-primary flex-shrink-0" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
                 </form>
 
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item dropdown me-2">
-                        <a class="nav-link dropdown-toggle btn-action-icon" href="#" role="button" data-bs-toggle="dropdown" title="Выбрать язык"><i class="bi bi-globe2"></i></a>
+                        <a class="nav-link dropdown-toggle btn-action-icon" href="#" role="button" data-bs-toggle="dropdown" title="Выбрать язык">
+                            <i class="bi bi-globe2"></i>
+                        </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             @php $currentLocale = session('locale', config('app.locale')); @endphp
-                            <li><a class="dropdown-item d-flex align-items-center {{ $currentLocale == 'tm' ? 'active' : '' }}" href="{{ route('locale.switch', 'tm') }}"><img src="https://www.ynamdar.com/static/tm.png" alt="TM" class="lang-flag me-2">Türkmen</a></li>
-                            <li><a class="dropdown-item d-flex align-items-center {{ $currentLocale == 'ru' ? 'active' : '' }}" href="{{ route('locale.switch', 'ru') }}"><img src="https://www.ynamdar.com/static/ru.png" alt="RU" class="lang-flag me-2">Русский</a></li>
-                            <li><a class="dropdown-item d-flex align-items-center {{ $currentLocale == 'en' ? 'active' : '' }}" href="{{ route('locale.switch', 'en') }}"><img src="https://www.ynamdar.com/static/en.png" alt="EN" class="lang-flag me-2">English</a></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center {{ $currentLocale == 'tm' ? 'active' : '' }}" href="{{ route('locale.switch', 'tm') }}"><img src="https://www.ynamdar.com/static/tm.png" alt="TM" class="lang-flag me-2">Türkmen</a></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center {{ $currentLocale == 'ru' ? 'active' : '' }}" href="{{ route('locale.switch', 'ru') }}"><img src="https://www.ynamdar.com/static/ru.png" alt="RU" class="lang-flag me-2">Русский</a></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center {{ $currentLocale == 'en' ? 'active' : '' }}" href="{{ route('locale.switch', 'en') }}"><img src="https://www.ynamdar.com/static/en.png" alt="EN" class="lang-flag me-2">English</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">

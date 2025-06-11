@@ -51,10 +51,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::prefix('compare')->name('compare.')->group(function () {
-    Route::get('/', [CompareController::class, 'index'])->name('index'); 
-    Route::post('/toggle/{product}', [CompareController::class, 'toggle'])->name('toggle'); 
-    Route::post('/clear', [CompareController::class, 'clear'])->name('clear');
-});
-
 require __DIR__ . '/auth.php'; 

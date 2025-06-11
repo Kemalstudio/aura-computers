@@ -1,27 +1,52 @@
 {{-- resources/views/catalog/partials/static_filters.blade.php --}}
-{{-- ЭТОТ ФАЙЛ ТЕПЕРЬ СОДЕРЖИТ ТОЛЬКО СТАТИЧЕСКИЕ ФИЛЬТРЫ --}}
 
-{{-- Фильтр по брендам --}}
 @if(isset($availableBrands) && $availableBrands->count() > 0)
-@php $isBrandFilterApplied = isset($selectedBrandSlugs) && count($selectedBrandSlugs) > 0; @endphp
+@php
+$isBrandFilterApplied = isset($selectedBrandSlugs) && count($selectedBrandSlugs) > 0;
+// Сортируем бренды по имени для корректной группировки
+$sortedBrands = $availableBrands->sortBy('name');
+@endphp
 <div class="filter-section mb-3 card">
     <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapseBrandsFilter" aria-expanded="{{ $isBrandFilterApplied ? 'true' : 'false' }}" aria-controls="collapseBrandsFilter">
-        <span>Бренд</span> <i class="bi {{ $isBrandFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
+        <span>Бренд</span>
+        <i class="bi {{ $isBrandFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
     </h6>
     <div class="collapse {{ $isBrandFilterApplied ? 'show' : '' }}" id="collapseBrandsFilter">
         <div class="card-body filter-section-body">
-            @foreach($availableBrands as $brand)
-            <div class="form-check">
-                <input class="form-check-input filter-input" type="checkbox" name="brands[]" value="{{ $brand->slug }}" id="brand-filter-{{ $brand->slug }}" @if(isset($selectedBrandSlugs) && in_array($brand->slug, $selectedBrandSlugs)) checked @endif>
-                <label class="form-check-label" for="brand-filter-{{ $brand->slug }}">{{ $brand->name }}</label>
+            {{-- Поле для поиска брендов --}}
+            <div class="mb-3">
+                <input type="text" id="brand-search-input" class="form-control form-control-sm" placeholder="Поиск бренда...">
             </div>
-            @endforeach
+
+            <div id="brands-list">
+                @php $currentLetter = ''; @endphp
+                @foreach($sortedBrands as $brand)
+                @php
+                // Получаем первую букву бренда в верхнем регистре
+                $firstLetter = mb_strtoupper(mb_substr($brand->name, 0, 1));
+                @endphp
+
+                {{-- Если первая буква изменилась, добавляем разделитель (кроме самого первого элемента) --}}
+                @if ($firstLetter !== $currentLetter && $currentLetter !== '')
+                <hr class="my-2 brand-separator">
+                @endif
+
+                <div class="form-check brand-item">
+                    <input class="form-check-input filter-input" type="checkbox" name="brands[]" value="{{ $brand->slug }}" id="brand-filter-{{ $brand->slug }}" @if(isset($selectedBrandSlugs) && in_array($brand->slug, $selectedBrandSlugs)) checked @endif>
+                    <label class="form-check-label" for="brand-filter-{{ $brand->slug }}">{{ $brand->name }}</label>
+                </div>
+
+                @php
+                // Обновляем текущую букву
+                $currentLetter = $firstLetter;
+                @endphp
+                @endforeach
+            </div>
         </div>
     </div>
 </div>
 @endif
 
-{{-- Фильтр по цене --}}
 @if(isset($overallMinPrice) && isset($overallMaxPrice) && $overallMaxPrice > $overallMinPrice)
 @php $isPriceFilterApplied = (request('min_price') !== null && request('min_price') != ($overallMinPrice ?? 0)) || (request('max_price') !== null && ($overallMaxPrice === null || request('max_price') != ($overallMaxPrice ?? 0))); @endphp
 <div class="filter-section mb-3 card">
@@ -41,7 +66,6 @@
 </div>
 @endif
 
-{{-- Фильтр "Особенности" --}}
 @php
 $selectedAvailability = (array) request('availability', []);
 $isFeaturesFilterApplied = request('is_new') == '1' || !empty($selectedAvailability);
@@ -67,4 +91,53 @@ $isFeaturesFilterApplied = request('is_new') == '1' || !empty($selectedAvailabil
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('brand-search-input');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                const brandItems = document.querySelectorAll('#brands-list .brand-item');
+
+                brandItems.forEach(item => {
+                    const label = item.querySelector('label');
+                    const brandName = label.textContent.toLowerCase();
+                    if (brandName.includes(searchTerm)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                updateSeparators();
+            });
+        }
+
+        function updateSeparators() {
+            const separators = document.querySelectorAll('#brands-list .brand-separator');
+            separators.forEach(hr => {
+                let nextElement = hr.nextElementSibling;
+                let groupHasVisibleItem = false;
+
+                while (nextElement && !nextElement.classList.contains('brand-separator')) {
+                    if (nextElement.style.display !== 'none') {
+                        groupHasVisibleItem = true;
+                        break;
+                    }
+                    nextElement = nextElement.nextElementSibling;
+                }
+
+                hr.style.display = groupHasVisibleItem ? '' : 'none';
+            });
+        }
+
+        const brandCollapse = document.getElementById('collapseBrandsFilter');
+        if (brandCollapse) {
+            brandCollapse.addEventListener('shown.bs.collapse', function() {
+                updateSeparators();
+            });
+        }
+    });
+</script>
