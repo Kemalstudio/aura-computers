@@ -1,25 +1,20 @@
 <div class="card shadow-sm product-card border-0 rounded-3 overflow-hidden d-flex flex-column h-100">
     <div class="product-card-top-actions position-absolute top-0 end-0 m-2 d-flex align-items-center" style="z-index: 10;">
-        <!-- Compare Element -->
-        <label class="product-action-control d-flex align-items-center p-1 rounded me-1" for="compareCheckbox_{{ $product->id ?? Str::random(5) }}" title="Сравнить"
-            style="/* Base inline styles are now less critical as CSS classes will handle more */
-                      font-size: 12px; line-height: 1; cursor:pointer;">
-            <input class="form-check-input m-0 me-1 shadow-none" type="checkbox" value="{{ $product->id ?? '' }}" id="compareCheckbox_{{ $product->id ?? Str::random(5) }}" style="width: 1em; height: 1em;">
+        {{-- Элемент для Сравнения (работает с JS из layouts/app.blade.php) --}}
+        <label class="product-action-control d-flex align-items-center p-1 rounded me-1" for="compareCheckbox_{{ $product->id ?? Str::random(5) }}" title="Сравнить" style="font-size: 12px; line-height: 1; cursor:pointer;">
+            <input class="form-check-input m-0 me-1 shadow-none compare-checkbox" type="checkbox" value="{{ $product->id ?? '' }}" id="compareCheckbox_{{ $product->id ?? Str::random(5) }}" style="width: 1em; height: 1em;">
             Сравнить
         </label>
 
-        <!-- Zoom Button -->
-        <button type="button" class="product-action-control btn btn-light btn-sm p-0 me-1 d-flex align-items-center justify-content-center"
-            style="width: 24px; height: 24px; /* Base size */"
-            aria-label="Zoom" title="Zoom">
+        {{-- Кнопка Zoom (восстановлена) --}}
+        <button type="button" class="product-action-control btn btn-light btn-sm p-0 me-1 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;" aria-label="Zoom" title="Zoom">
             <i class="bi bi-zoom-in" style="font-size: 13px;"></i>
         </button>
 
-        <!-- Favorite Button -->
+        {{-- Кнопка "Избранное" (работает с JS из layouts/app.blade.php) --}}
         <button
             type="button"
-            class="product-action-control product-action-favorite btn btn-light btn-sm p-0 d-flex align-items-center justify-content-center
-           @auth @if(Auth::user()->favorites->contains($product)) is-favorite @endif @endauth"
+            class="product-action-control product-action-favorite btn btn-light btn-sm p-0 d-flex align-items-center justify-content-center"
             style="width: 24px; height: 24px;"
             aria-label="Добавить в избранное"
             title="Добавить в избранное"
@@ -37,6 +32,7 @@
         </div>
         @endif
     </a>
+
     <div class="card-body d-flex flex-column p-3">
         <h5 class="card-title mb-1 fs-6">
             <a href="{{ route('product.show', $product->slug) }}" class="text-blue text-decoration-none product-name-link stretched-link">
@@ -50,11 +46,9 @@
             </a>
         </small>
         @endif
-
         <p class="card-text small text-muted mb-3 flex-grow-1 product-description" style="font-size: 0.85em; min-height: 60px;">
             {{ Str::limit($product->description ?? 'Описание товара скоро появится.', 75) }}
         </p>
-
         <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top-dashed">
             <p class="fw-bold fs-5 mb-0 text-primary product-price">
                 {{ number_format($product->price ?? 0, 0, ',', ' ') }} <small class="text-muted" style="font-size:0.7em; font-weight:normal;">TMT</small>
@@ -65,11 +59,14 @@
             </button>
         </div>
     </div>
+
+    {{-- Бейджи "Новинка", "Скидка" и т.д. --}}
     @if(isset($product->is_new) && $product->is_new) <span class="badge bg-info position-absolute top-0 start-0 m-2 shadow-sm product-badge">Новинка</span> @endif
     @if(isset($product->on_sale_price) && $product->on_sale_price < $product->price) <span class="badge bg-danger position-absolute top-0 end-0 m-2 shadow-sm product-badge">Скидка</span> @endif
         @if(isset($product->quantity) && $product->quantity !== null && $product->quantity == 0) <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2 shadow-sm product-badge" style="right: auto !important; left: 0 !important; top: 2rem !important;">Нет в наличии</span> @endif
 </div>
 
+{{-- Этот блок будет добавлен только один раз на страницу, даже если карточек много --}}
 @once
 @push('styles')
 <style>
@@ -78,15 +75,12 @@
         --product-border: #e9ecef;
         --product-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
         --product-icon-color: #495057;
-
         --product-hover-bg: rgba(255, 255, 255, 1);
         --product-hover-border: #adb5bd;
         --product-hover-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         --product-hover-icon-color: #212529;
-
         --product-focus-border: var(--bs-primary, #0d6efd);
         --product-focus-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb, 13, 110, 253), 0.25);
-
         --product-favorite-active-color: var(--bs-danger, #dc3545);
         --product-favorite-active-bg: rgba(var(--bs-danger-rgb, 220, 53, 69), 0.1);
     }
@@ -105,7 +99,7 @@
         opacity: 0;
         visibility: hidden;
         transform: translateY(5px);
-        transition: opacity 0.25s ease-out, visibility 0.25s ease-out, transform 0.25s ease-out;
+        transition: all 0.25s ease-out;
     }
 
     .product-card:hover .product-card-top-actions {
@@ -120,11 +114,7 @@
         box-shadow: var(--product-shadow);
         color: var(--product-icon-color);
         border-radius: .25rem;
-        transition: transform 0.2s ease-out,
-            background-color 0.2s ease-out,
-            border-color 0.2s ease-out,
-            box-shadow 0.2s ease-out,
-            color 0.2s ease-out;
+        transition: all 0.2s ease-out;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -156,7 +146,7 @@
 
     .product-action-control .bi {
         color: var(--product-icon-color);
-        transition: color 0.2s ease-out;
+        transition: all 0.2s ease-out;
         vertical-align: middle;
     }
 
@@ -182,26 +172,6 @@
 
     label.product-action-control .form-check-input:focus {
         box-shadow: none;
-    }
-
-
-    .product-action-favorite.is-favorite {
-        background-color: var(--product-favorite-active-bg);
-        border-color: var(--product-favorite-active-color);
-        color: var(--product-favorite-active-color);
-    }
-
-    .product-action-favorite.is-favorite .bi-heart::before {
-        content: "\f415";
-        font-weight: bold;
-    }
-
-    .product-action-favorite.is-favorite .bi {
-        color: var(--product-favorite-active-color);
-    }
-
-    button.product-action-control[style*="width: 24px"] {
-        padding: 0;
     }
 
     .product-card-img,
@@ -234,6 +204,23 @@
         padding: 0.35em 0.6em;
         letter-spacing: 0.05em;
         z-index: 5;
+    }
+
+    /* === Стили для плавной анимации иконки "Избранное" === */
+    .product-action-favorite.is-favorite {
+        background-color: var(--product-favorite-active-bg);
+        border-color: var(--product-favorite-active-color);
+    }
+
+    .product-action-favorite.is-favorite .bi {
+        color: var(--product-favorite-active-color);
+        transform: scale(1.1);
+    }
+
+    .product-action-favorite.is-favorite .bi-heart::before {
+        content: "\f415";
+        /* Код иконки bi-heart-fill */
+        font-weight: bold;
     }
 </style>
 @endpush

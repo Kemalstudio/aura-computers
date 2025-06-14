@@ -3,16 +3,19 @@
 @section('title', $product->meta_title ?: ($product->name . ' - Aura Computers'))
 
 @push('styles')
+<link rel="shortcut icon" href="/images/logo/logo.svg" type="image/x-icon">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
     body {
-        background-color: #f8f9fa;
+        /* Используем переменные Bootstrap для совместимости с темной/светлой темой */
+        background-color: var(--bs-body-bg);
     }
 
     .product-card {
-        border: 1px solid #dee2e6;
         border-radius: 0.75rem;
         overflow: hidden;
+        background-color: var(--bs-tertiary-bg);
+        border: 1px solid var(--bs-border-color);
     }
 
     /* Стили для Карусели изображений */
@@ -34,7 +37,7 @@
         width: 80px;
         height: 80px;
         object-fit: cover;
-        border: 2px solid #dee2e6;
+        border: 2px solid var(--bs-border-color);
         border-radius: 0.375rem;
         cursor: pointer;
         transition: border-color 0.2s ease-in-out, transform 0.2s ease-in-out;
@@ -55,11 +58,11 @@
     /* Стили для Артикула */
     .sku-input-group .form-control {
         border-right: 0;
-        background-color: #fff;
+        background-color: var(--bs-body-bg);
     }
 
     .sku-input-group .btn {
-        border-color: #ced4da;
+        border-color: var(--bs-border-color);
     }
 
     .sku-input-group .btn-google {
@@ -68,16 +71,14 @@
     }
 
     .sku-input-group .btn:hover {
-        background-color: #e9ecef;
+        background-color: var(--bs-tertiary-bg);
     }
 
-    /* NEW: Стили для нового блока "Добавить в корзину" */
+    /* Стили для блока "Добавить в корзину" */
     .quantity-selector {
         max-width: 150px;
-        /* Ограничиваем ширину блока с количеством */
     }
 
-    /* Остальные стили */
     .product-price-display {
         font-weight: 700;
     }
@@ -88,11 +89,11 @@
     }
 
     .nav-tabs {
-        border-bottom: 2px solid #dee2e6;
+        border-bottom: 2px solid var(--bs-border-color);
     }
 
     .nav-tabs .nav-link {
-        color: #495057;
+        color: var(--bs-secondary-color);
         border: none;
         border-bottom: 2px solid transparent;
         border-radius: 0;
@@ -103,35 +104,58 @@
     }
 
     .nav-tabs .nav-link.active {
-        color: var(--bs-primary, #0d6efd);
+        color: var(--bs-primary);
         background-color: transparent;
-        border-color: var(--bs-primary, #0d6efd);
+        border-color: var(--bs-primary);
         font-weight: 600;
     }
 
-    .tab-content {
-        background-color: #fff;
-        border: 1px solid #dee2e6;
+    .tab-content-wrapper {
+        background-color: var(--bs-tertiary-bg);
+        border: 1px solid var(--bs-border-color);
         border-top: none;
         border-radius: 0 0 0.5rem 0.5rem;
-        padding: 1.5rem;
     }
 
     .product-specs-table th {
-        background-color: #f8f9fa;
+        background-color: var(--bs-body-bg);
         width: 35%;
         font-weight: 500;
     }
 
+    /* Fix for number input arrows in Chrome/Safari */
     .quantity-input {
-        -webkit-appearance: none;
-        margin: 0;
+        -webkit-appearance: textfield;
+        -moz-appearance: textfield;
+        appearance: textfield;
     }
 
     .quantity-input::-webkit-outer-spin-button,
     .quantity-input::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
+    }
+
+    /* === СТИЛИ ДЛЯ АКТИВНОЙ КНОПКИ "ИЗБРАННОЕ" === */
+    .product-action-favorite .icon-filled,
+    .product-action-favorite .text-in-favorites {
+        display: none;
+    }
+
+    .product-action-favorite.is-favorite {
+        background-color: var(--bs-danger-bg-subtle);
+        border-color: var(--bs-danger-border-subtle);
+        color: var(--bs-danger-text-emphasis);
+    }
+
+    .product-action-favorite.is-favorite .icon-filled,
+    .product-action-favorite.is-favorite .text-in-favorites {
+        display: inline-block;
+    }
+
+    .product-action-favorite.is-favorite .icon-empty,
+    .product-action-favorite.is-favorite .text-add-to-favorites {
+        display: none;
     }
 </style>
 @endpush
@@ -148,7 +172,7 @@
         </ol>
     </nav>
 
-    <div class="card shadow-sm product-card">
+    <div class="card product-card shadow-sm">
         <div class="card-body p-lg-4">
             <div class="row g-4 g-lg-5">
                 {{-- Carousel Section --}}
@@ -159,8 +183,7 @@
                     if (!empty($product->images) && is_array($product->images)) { $galleryImages = array_merge($galleryImages, $product->images); }
                     @endphp
                     @if(!empty($galleryImages))
-                    <div id="productImageCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
-                        {{-- ... carousel items ... --}}
+                    <div id="productImageCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner rounded">
                             @foreach($galleryImages as $image)
                             <div class="carousel-item @if ($loop->first) active @endif product-carousel-item">
@@ -168,21 +191,24 @@
                             </div>
                             @endforeach
                         </div>
+                        @if(count($galleryImages) > 1)
                         <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span></button>
                         <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span></button>
+                        @endif
                     </div>
+                    @if(count($galleryImages) > 1)
                     <div class="d-flex flex-wrap justify-content-center gap-2 mt-3" id="productThumbnails">
                         @foreach($galleryImages as $image)
                         <img src="{{ $image }}" alt="Миниатюра {{ $loop->iteration }}" class="product-gallery-thumbnail @if ($loop->first) active @endif" data-bs-target="#productImageCarousel" data-bs-slide-to="{{ $loop->index }}">
                         @endforeach
                     </div>
+                    @endif
                     @else
-                    <img src="{{ asset('images/placeholder-product.png') }}" class="img-fluid" alt="Нет изображения">
+                    <img src="{{ asset('images/placeholder-product.png') }}" class="img-fluid rounded" alt="Нет изображения">
                     @endif
                 </div>
 
                 <div class="col-lg-6 d-flex flex-column">
-                    {{-- ... product name, brand, sku --}}
                     @if($product->brand)
                     <div class="d-flex align-items-center mb-2">
                         @if($product->brand->logo_url)
@@ -198,7 +224,7 @@
                         <div class="input-group sku-input-group">
                             <input type="text" id="skuInput" class="form-control" value="{{ $product->sku ?? 'N/A' }}" readonly>
                             <button class="btn btn-outline-secondary" type="button" id="copySkuBtn" title="Копировать артикул"><i class="bi bi-clipboard"></i></button>
-                            <a href="https://www.google.com/search?q={{ urlencode($product->sku ?? '') }}" target="_blank" class="btn btn-outline-secondary btn-google" title="Искать в Google">G</a>
+                            <a href="https://www.google.com/search?q={{ urlencode($product->name . ' ' . ($product->sku ?? '')) }}" target="_blank" class="btn btn-outline-secondary btn-google" title="Искать в Google">G</a>
                         </div>
                     </div>
                     <div class="d-flex align-items-center text-muted small mb-3">
@@ -211,13 +237,13 @@
 
                     {{-- Price and Actions Block --}}
                     <div class="mt-auto">
-                        <div class="bg-light p-3 rounded-3 mb-4">
+                        <div class="bg-body-tertiary p-3 rounded-3 mb-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="h2 fw-bolder text-primary product-price-display">{{ number_format($product->sale_price ?? $product->price, 2, ',', ' ') }}</span>
+                                    <span class="h2 fw-bolder text-primary product-price-display">{{ number_format($product->sale_price ?? $product->price, 0, ',', ' ') }}</span>
                                     <span class="ms-1 text-muted">TMT</span>
                                     @if(isset($product->sale_price) && $product->sale_price < $product->price)
-                                        <s class="text-muted ms-2 d-block"><small>{{ number_format($product->price, 2, ',', ' ') }} TMT</small></s>
+                                        <s class="text-muted ms-2 d-block"><small>{{ number_format($product->price, 0, ',', ' ') }} TMT</small></s>
                                         @endif
                                 </div>
                                 @if(isset($product->sale_price) && $product->sale_price < $product->price)
@@ -226,13 +252,10 @@
                             </div>
                         </div>
 
-                        {{-- ========================================================= --}}
-                        {{-- IMPROVED: Add to Cart Form (as per your image)          --}}
-                        {{-- ========================================================= --}}
                         @if($product->quantity > 0)
-                        <form action="{{-- route('cart.add', $product) --}}" method="POST">
+                        <form action="{{-- route('cart.add', $product) --}}" method="POST" class="mb-3">
                             @csrf
-                            <div class="d-flex gap-2 mb-3">
+                            <div class="d-flex gap-2">
                                 <div class="input-group quantity-selector">
                                     <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
                                     <input type="number" name="quantity" class="form-control text-center quantity-input" value="1" min="1" max="{{ $product->quantity }}" aria-label="Количество">
@@ -242,31 +265,42 @@
                                     <i class="bi bi-cart2 me-2"></i>Добавить в корзину
                                 </button>
                             </div>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-outline-secondary w-50">
-                                    <i class="bi bi-heart me-1"></i> В избранное
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary w-50">
-                                    <i class="bi bi-bar-chart-line me-1"></i> Сравнить
-                                </button>
-                            </div>
                         </form>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-secondary w-50 product-action-favorite" data-product-id="{{ $product->id }}">
+                                <i class="bi bi-heart-fill icon-filled"></i>
+                                <i class="bi bi-heart icon-empty"></i>
+                                <span class="text-in-favorites ms-1">В избранном</span>
+                                <span class="text-add-to-favorites ms-1">В избранное</span>
+                            </button>
+                            <div class="w-50 d-grid">
+                                <input type="checkbox"
+                                    class="btn-check compare-checkbox"
+                                    id="compareCheck-{{ $product->id }}"
+                                    value="{{ $product->id }}"
+                                    autocomplete="off">
+                                <label class="btn btn-outline-secondary" for="compareCheck-{{ $product->id }}">
+                                    <i class="bi bi-bar-chart-line me-1"></i> Сравнить
+                                </label>
+                            </div>
+                        </div>
                         @else
                         <div class="alert alert-warning" role="alert"><i class="bi bi-info-circle-fill me-2"></i>К сожалению, этого товара сейчас нет в наличии.</div>
-                        <button type="button" class="btn btn-outline-primary"><i class="bi bi-bell me-1"></i> Сообщить о поступлении</button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary w-50"><i class="bi bi-bell me-1"></i> Сообщить о поступлении</button>
+                            <div class="w-50 d-grid">
+                                <input type="checkbox" class="btn-check compare-checkbox" id="compareCheck-{{ $product->id }}" value="{{ $product->id }}" autocomplete="off">
+                                <label class="btn btn-outline-secondary" for="compareCheck-{{ $product->id }}"><i class="bi bi-bar-chart-line me-1"></i> Сравнить</label>
+                            </div>
+                        </div>
                         @endif
-                        {{-- ========================================================= --}}
-                        {{-- END: Add to Cart Form                  --}}
-                        {{-- ========================================================= --}}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- ========================================================= --}}
-    {{-- RESTORED: Tabs with Description and Specifications     --}}
-    {{-- ========================================================= --}}
+    {{-- Tabs with Description and Specifications --}}
     <div class="mt-5">
         <ul class="nav nav-tabs" id="productTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -276,10 +310,11 @@
                 <button class="nav-link" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications-tab-pane" type="button" role="tab" aria-controls="specifications-tab-pane" aria-selected="false">Характеристики</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-tab-pane" type="button" role="tab" aria-controls="reviews-tab-pane" aria-selected="false">Отзывы ({{ $product->reviews->count() }})</button>
+                {{-- Предполагаем, что у вас может быть связь reviews() на модели Product --}}
+                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-tab-pane" type="button" role="tab" aria-controls="reviews-tab-pane" aria-selected="false">Отзывы ({{ $product->reviews->count() ?? 0 }})</button>
             </li>
         </ul>
-        <div class="tab-content" id="productTabContent">
+        <div class="tab-content tab-content-wrapper" id="productTabContent">
             <div class="tab-pane fade show active p-4" id="description-tab-pane" role="tabpanel" aria-labelledby="description-tab" tabindex="0">
                 <h3 class="h5 mb-3">Подробное описание товара</h3>
                 @if($product->long_description)
@@ -290,20 +325,37 @@
                 <p class="text-muted">Подробное описание для этого товара пока отсутствует.</p>
                 @endif
             </div>
+
+            <!-- ========================================================= -->
+            <!-- ВОССТАНОВЛЕНО: Блок "Характеристики" из вашего второго примера -->
+            <!-- ========================================================= -->
             <div class="tab-pane fade p-0" id="specifications-tab-pane" role="tabpanel" aria-labelledby="specifications-tab" tabindex="0">
                 @php
-                $displayableAttributes = $product->getDisplayableAttributes();
+                // Используем метод getDisplayableAttributes(), как в вашем рабочем примере.
+                // Если такого метода нет, замените его на `$product->attributes`
+                $displayableAttributes = method_exists($product, 'getDisplayableAttributes') ? $product->getDisplayableAttributes() : ($product->attributes ?? collect());
                 @endphp
                 @if($displayableAttributes->isNotEmpty())
                 <table class="table table-striped table-hover product-specs-table mb-0">
                     <tbody>
                         @foreach($displayableAttributes as $attribute)
                         <tr>
-                            <th scope="row">{{ $attribute->name }}</th>
+                            <th scope="row">
+                                {{-- В зависимости от структуры, может быть $attribute->name или $attribute->attribute->name --}}
+                                {{ $attribute->name ?? $attribute->attribute->name }}
+                            </th>
                             <td>
+                                @if(isset($attribute->value))
                                 {{ $attribute->value }}
-                                @if($attribute->unit)
+                                {{-- Если это стандартная связь many-to-many, то значение в pivot таблице --}}
+                                @elseif(isset($attribute->pivot))
+                                {{ $attribute->pivot->value }}
+                                @endif
+
+                                @if(isset($attribute->unit))
                                 {{ $attribute->unit }}
+                                @elseif(isset($attribute->attribute->unit))
+                                {{ $attribute->attribute->unit }}
                                 @endif
                             </td>
                         </tr>
@@ -316,22 +368,18 @@
                 </div>
                 @endif
             </div>
+
             <div class="tab-pane fade p-4" id="reviews-tab-pane" role="tabpanel" aria-labelledby="reviews-tab" tabindex="0">
                 <p class="text-muted">Отзывы пока отсутствуют. Станьте первым!</p>
             </div>
         </div>
     </div>
-    {{-- ========================================================= --}}
-    {{-- END: Restored Section                   --}}
-    {{-- ========================================================= --}}
-
 </div>
 @endsection
 
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // SKU Copy Logic
         const copyBtn = document.getElementById('copySkuBtn');
         if (copyBtn) {
             const skuInput = document.getElementById('skuInput');
@@ -348,15 +396,40 @@
             });
         }
 
-        // Carousel and Thumbnails Sync Logic
-        const productImageCarousel = document.getElementById('productImageCarousel');
-        if (productImageCarousel) {
+        const productImageCarouselEl = document.getElementById('productImageCarousel');
+        if (productImageCarouselEl) {
             const thumbnails = document.querySelectorAll('#productThumbnails .product-gallery-thumbnail');
-            productImageCarousel.addEventListener('slide.bs.carousel', function(event) {
+            const carouselInstance = new bootstrap.Carousel(productImageCarouselEl);
+
+            productImageCarouselEl.addEventListener('slide.bs.carousel', function(event) {
                 thumbnails.forEach(thumb => thumb.classList.remove('active'));
-                if (thumbnails[event.to]) {
-                    thumbnails[event.to].classList.add('active');
+                const activeThumb = document.querySelector(`.product-gallery-thumbnail[data-bs-slide-to="${event.to}"]`);
+                if (activeThumb) {
+                    activeThumb.classList.add('active');
                 }
+            });
+
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    const slideIndex = this.getAttribute('data-bs-slide-to');
+                    carouselInstance.to(parseInt(slideIndex));
+                })
+            })
+        }
+
+        const favoriteBtn = document.querySelector('.product-action-favorite');
+        if (favoriteBtn) {
+
+            favoriteBtn.addEventListener('click', function() {
+                const productId = this.dataset.productId;
+                const isFavorite = this.classList.contains('is-favorite');
+
+                //     if (data.success) {
+                this.classList.toggle('is-favorite');
+                //     }
+                // });
+
+                this.classList.toggle('is-favorite');
             });
         }
     });

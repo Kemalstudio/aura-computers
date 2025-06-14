@@ -2,123 +2,111 @@
 
 <nav class="navbar navbar-expand-lg sticky-top shadow-sm" id="appNavbar" style="z-index: 2000;">
     <div class="container-fluid">
-        <!-- Левая сторона: Логотип и название магазина -->
+        <!-- Logo -->
         <a class="navbar-brand d-flex align-items-center" href="{{ route('dashboard') }}">
             <x-application-logo class="d-inline-block align-text-top me-2" style="height: 36px; width: auto;" />
             <span class="fw-bold fs-5 d-none d-md-inline-block">Aura Computers</span>
         </a>
 
-        <!-- Переключатель-гамбургер -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Переключить навигацию">
+        <!-- Hamburger Toggler -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- Left side links (if any) -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             </ul>
 
-            <!-- Правая сторона: Иконки и авторизация -->
+            <!-- Right side icons and auth -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
-                @php
-                $currentLocale = app()->getLocale();
-                $locales = [
-                'tm' => ['name' => 'Türkmençe', 'flag' => 'https://flagcdn.com/w20/tm.png', 'flag_srcset' => 'https://flagcdn.com/w40/tm.png 2x'],
-                'ru' => ['name' => 'Русский', 'flag' => 'https://flagcdn.com/w20/ru.png', 'flag_srcset' => 'https://flagcdn.com/w40/ru.png 2x'],
-                'en' => ['name' => 'English', 'flag' => 'https://flagcdn.com/w20/gb.png', 'flag_srcset' => 'https://flagcdn.com/w40/gb.png 2x'],
-                ];
-                @endphp
-
-                <!-- Переключатель темы (Десктоп) -->
+                <!-- Theme Toggler (Desktop) -->
                 <li class="nav-item d-none d-lg-block">
-                    <button id="themeTogglerDesktop" type="button" class="btn btn-link nav-link nav-icon-btn" aria-label="Переключить тему">
+                    <button id="themeTogglerDesktop" type="button" class="btn btn-link nav-link nav-icon-btn" aria-label="@lang('nav.switch_theme_dark')">
                         <i class="bi bi-sun-fill theme-icon-light fs-5"></i>
                         <i class="bi bi-moon-stars-fill theme-icon-dark fs-5" style="display: none;"></i>
                     </button>
                 </li>
 
-                <!-- Избранное (Десктоп) -->
+                <!-- Favorites (Desktop) -->
                 <li class="nav-item d-none d-lg-block">
-                    <a href="{{-- route('wishlist.index') --}}" class="nav-link nav-icon-btn position-relative" aria-label="Избранное">
+                    <a href="#" class="nav-link nav-icon-btn position-relative" aria-label="@lang('nav.favorites')">
                         <i class="bi bi-heart fs-5"></i>
-                        {{-- Опциональный счетчик: <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3 <span class="visually-hidden">товаров в избранном</span></span> --}}
                     </a>
                 </li>
 
-                <!-- Корзина (Десктоп) -->
+                <!-- Cart (Desktop) -->
                 <li class="nav-item d-none d-lg-block">
-                    <a href="{{-- route('cart.index') --}}" class="nav-link nav-icon-btn position-relative" aria-label="Корзина">
+                    <a href="#" class="nav-link nav-icon-btn position-relative" aria-label="@lang('nav.cart')">
                         <i class="bi bi-cart3 fs-5"></i>
-                        {{-- Опциональный счетчик: <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">5 <span class="visually-hidden">товаров в корзине</span></span> --}}
                     </a>
                 </li>
 
-                <!-- Переключатель языков (Десктоп) -->
+                <!-- ========================================================== -->
+                <!--       UPDATED Language Switcher (Desktop)                -->
+                <!-- ========================================================== -->
+
                 <li class="nav-item dropdown d-none d-lg-block">
-                    <a class="nav-link nav-icon-btn dropdown-toggle" href="#" id="languageDropdownDesktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Выбрать язык">
-                        <i class="bi bi-translate fs-5"></i> 
+                    {{-- This button now shows the CURRENTLY ACTIVE language --}}
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="languageDropdownDesktop" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@lang('nav.select_language')">
+                        <img src="{{ $locales[$currentLocale]['flag'] }}" width="20" alt="{{ $locales[$currentLocale]['name'] }}" class="me-2">
+                        <span class="d-none d-xl-inline">{{ $locales[$currentLocale]['name'] }}</span>
+                        <span class="d-inline d-xl-none">{{ strtoupper($currentLocale) }}</span>
                     </a>
+
+                    {{-- The dropdown menu now uses our reusable partial --}}
                     <ul class="dropdown-menu dropdown-menu-end animate slideIn" aria-labelledby="languageDropdownDesktop">
-                        @foreach ($locales as $localeCode => $properties)
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center @if($currentLocale == $localeCode) active @endif"
-                                href="{{ route('locale.switch', $localeCode) }}"> {{-- Предполагаем, что есть маршрут для смены языка --}}
-                                <img src="{{ $properties['flag'] }}" srcset="{{ $properties['flag_srcset'] }}" width="20" alt="{{ $properties['name'] }}" class="me-2">
-                                {{ $properties['name'] }}
-                            </a>
-                        </li>
-                        @endforeach
+                        @include('partials._language-menu-items')
                     </ul>
                 </li>
 
 
-                <!-- Разделитель для визуальной ясности в мобильном виде -->
+                <!-- Mobile Menu Divider -->
                 <li class="nav-item d-lg-none">
                     <hr class="dropdown-divider">
                 </li>
 
-                <!-- Переключатель темы (Мобильный) -->
+                <!-- Theme Toggler (Mobile) -->
                 <li class="nav-item d-lg-none">
                     <button id="themeTogglerMobile" type="button" class="btn btn-link nav-link d-flex align-items-center w-100 text-start mobile-menu-item">
                         <i class="bi bi-sun-fill theme-icon-light fs-5 me-2"></i>
                         <i class="bi bi-moon-stars-fill theme-icon-dark fs-5 me-2" style="display: none;"></i>
-                        <span class="theme-toggler-text">Переключить на темную тему</span>
+                        <span class="theme-toggler-text">@lang('nav.switch_theme_dark')</span>
                     </button>
                 </li>
 
-                <!-- Избранное (Мобильный) -->
+                <!-- Favorites (Mobile) -->
                 <li class="nav-item d-lg-none">
-                    <a href="{{-- route('wishlist.index') --}}" class="nav-link d-flex align-items-center mobile-menu-item">
-                        <i class="bi bi-heart fs-5 me-2"></i> Избранное
+                    <a href="#" class="nav-link d-flex align-items-center mobile-menu-item">
+                        <i class="bi bi-heart fs-5 me-2"></i> @lang('nav.favorites')
                     </a>
                 </li>
 
-                <!-- Корзина (Мобильный) -->
+                <!-- Cart (Mobile) -->
                 <li class="nav-item d-lg-none">
-                    <a href="{{-- route('cart.index') --}}" class="nav-link d-flex align-items-center mobile-menu-item">
-                        <i class="bi bi-cart3 fs-5 me-2"></i> Корзина
+                    <a href="#" class="nav-link d-flex align-items-center mobile-menu-item">
+                        <i class="bi bi-cart3 fs-5 me-2"></i> @lang('nav.cart')
                     </a>
                 </li>
 
-                <!-- Переключатель языков (Мобильный) -->
+                <!-- ========================================================== -->
+                <!--        UPDATED Language Switcher (Mobile)                -->
+                <!-- ========================================================== -->
+
                 <li class="nav-item dropdown d-lg-none">
+                    {{-- This button also shows the CURRENTLY ACTIVE language --}}
                     <a class="nav-link dropdown-toggle d-flex align-items-center mobile-menu-item" href="#" id="languageDropdownMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-translate fs-5 me-2"></i> Выбрать язык
+                        <img src="{{ $locales[$currentLocale]['flag'] }}" width="20" alt="{{ $locales[$currentLocale]['name'] }}" class="me-2">
+                        {{ $locales[$currentLocale]['name'] }}
                     </a>
+
+                    {{-- The dropdown menu uses the SAME reusable partial --}}
                     <ul class="dropdown-menu animate slideIn" aria-labelledby="languageDropdownMobile">
-                        @foreach ($locales as $localeCode => $properties)
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center @if($currentLocale == $localeCode) active @endif"
-                                href="{{ route('locale.switch', $localeCode) }}">
-                                <img src="{{ $properties['flag'] }}" srcset="{{ $properties['flag_srcset'] }}" width="20" alt="{{ $properties['name'] }}" class="me-2">
-                                {{ $properties['name'] }}
-                            </a>
-                        </li>
-                        @endforeach
+                        @include('partials._language-menu-items')
                     </ul>
                 </li>
 
-
-                <!-- Ссылки/Выпадающее меню аутентификации -->
+                <!-- Authentication links -->
                 @guest
                 <li class="nav-item d-lg-none">
                     <hr class="dropdown-divider">
@@ -127,7 +115,7 @@
                     <a href="{{ route('login') }}" class="nav-link {{ request()->routeIs('login') ? 'active' : '' }} mobile-menu-item">
                         <i class="bi bi-box-arrow-in-right fs-5 me-2 d-lg-none"></i>
                         <i class="bi bi-box-arrow-in-right fs-5 me-1 d-none d-lg-inline-flex align-items-center"></i>
-                        <span class="ms-1">Войти</span>
+                        <span class="ms-1">@lang('nav.login')</span>
                     </a>
                 </li>
                 @else
@@ -140,28 +128,18 @@
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center mobile-menu-item" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{-- This part is fine as it generates initials dynamically --}}
                         @php
                         $user = Auth::user();
                         $nameParts = explode(' ', $user->name, 2);
-                        $initials = '';
-                        if (isset($nameParts[0][0])) {
-                        $initials .= strtoupper($nameParts[0][0]);
-                        }
-                        if (isset($nameParts[1][0])) {
-                        $initials .= strtoupper($nameParts[1][0]);
-                        } else if (strlen($nameParts[0]) > 1 && !isset($nameParts[1][0])) {
-                        // Если только имя и оно длиннее 1 символа, берем 2 первые буквы имени
-                        $initials = strtoupper(substr($nameParts[0], 0, 2));
-                        }
-                        if (empty($initials) && isset($user->email[0])) { // Если имя пустое, берем первую букву email
-                        $initials = strtoupper($user->email[0]);
-                        }
+                        $initials = mb_substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? mb_substr($nameParts[1], 0, 1) : '');
+                        if(empty($initials)) $initials = mb_substr($user->email, 0, 1);
+                        $initials = strtoupper($initials);
                         @endphp
                         @if(filter_var($user->profile_photo_url, FILTER_VALIDATE_URL))
                         <img class="rounded-circle me-2 user-avatar" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" width="32" height="32">
                         @else
-                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle me-2 user-avatar-initials"
-                            data-bg-color="{{ \App\Helpers\ColorHelper::stringToColor($user->name) }}">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle me-2 user-avatar-initials" style="background-color: {{ \App\Helpers\ColorHelper::stringToColor($user->name) }}">
                             {{ $initials }}
                         </span>
                         @endif
@@ -172,11 +150,10 @@
                         </div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end animate slideIn" aria-labelledby="navbarDropdownUser">
-                        <li class="dropdown-header d-lg-none">@ {{ $user->name }}</li>
                         <li>
-                            <h6 class="dropdown-header d-none d-lg-block">Управление аккаунтом</h6>
+                            <h6 class="dropdown-header d-none d-lg-block">@lang('nav.manage_account')</h6>
                         </li>
-                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person-circle me-2"></i>Профиль</a></li>
+                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person-circle me-2"></i>@lang('nav.profile')</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -185,7 +162,7 @@
                                 @csrf
                                 <a class="dropdown-item text-danger" href="{{ route('logout') }}"
                                     onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">
-                                    <i class="bi bi-box-arrow-right me-2"></i>Выйти
+                                    <i class="bi bi-box-arrow-right me-2"></i>@lang('nav.logout')
                                 </a>
                             </form>
                         </li>

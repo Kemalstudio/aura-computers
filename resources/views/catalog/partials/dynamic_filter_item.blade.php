@@ -1,15 +1,13 @@
-{{-- resources/views/catalog/partials/dynamic_filter_item.blade.php --}}
-{{-- ЭТОТ ФАЙЛ-ПОМОЩНИК ОТРИСОВЫВАЕТ ТОЛЬКО ОДИН БЛОК ФИЛЬТРА --}}
-
 @php
     $optionsToUse = $filterData['options'] ?? [];
     $selectedValues = (array) request($filterKey, []);
     $isThisFilterApplied = !empty($selectedValues);
+    $isFirst = $isFirst ?? false;
 @endphp
 
 @if(!empty($optionsToUse))
-<div class="filter-section mb-3 card">
-    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold"
+<div class="filter-section">
+    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold @if(!$isFirst) border-top mt-3 @endif"
         role="button" data-bs-toggle="collapse" data-bs-target="#collapseFilterContent-{{ Str::studly($filterKey) }}"
         aria-expanded="{{ $isThisFilterApplied ? 'true' : 'false' }}">
         <span>{{ $filterData['label'] }} @if(!empty($filterData['unit'])) ({{ $filterData['unit'] }}) @endif</span>

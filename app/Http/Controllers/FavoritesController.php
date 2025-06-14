@@ -3,45 +3,47 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Illuminate\Contracts\View\View; // Правильный импорт для типа возвращаемого значения
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 
 class FavoritesController extends Controller
 {
     /**
-     * Показывает страницу с избранными товарами пользователя.
+     * Отображает страницу с избранными товарами пользователя.
      */
-    public function index()
+    public function index(): View
     {
-        // Получаем залогиненного пользователя и его избранные товары
-        $favoriteProducts = Auth::user()->favorites()->latest()->paginate(12);
+        // === ИСПРАВЛЕНИЕ ЗДЕСЬ ===
+        // Мы явно указываем, что сортировать нужно по полю `created_at` из таблицы `favorite_product`.
+        $products = Auth::user()
+            ->favorites()
+            ->orderBy('favorite_product.created_at', 'desc') // Правильная сортировка по дате добавления
+            ->paginate(12);
 
-        // Возвращаем красивый шаблон и передаем в него товары
-        return view('favorites.index', [
-            'products' => $favoriteProducts
-        ]);
+        return view('favorites.index', compact('products'));
     }
 
     /**
-     * Добавляет или удаляет товар из избранного (для JavaScript).
-     * Возвращает JSON-ответ.
+     * Добавляет или удаляет товар из избранного (для AJAX запросов).
      */
     public function toggle(Product $product): JsonResponse
     {
-        // toggle() - волшебный метод, который сам добавляет/удаляет связь
-        $result = Auth::user()->favorites()->toggle($product->id);
+        try {
+            $user = Auth::user();
+            $user->favorites()->toggle($product->id);
 
-        // Проверяем, был ли товар добавлен или удален
-        $isFavorite = !empty($result['attached']);
+            return response()->json([
+                'success' => true,
+                'count'   => $user->favorites()->count(),
+            ]);
 
-        // Считаем новое общее количество товаров в избранном
-        $newCount = Auth::user()->favorites()->count();
-
-        // Возвращаем ответ для JavaScript
-        return response()->json([
-            'success'     => true,
-            'is_favorite' => $isFavorite,
-            'new_count'   => $newCount,
-        ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка сервера. Не удалось обновить избранное.'
+            ], 500);
+        }
     }
 }

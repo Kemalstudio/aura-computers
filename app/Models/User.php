@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Product; // <-- Важно: импортируем модель Product
+// Подключаем необходимые классы
+use App\Models\Product; // Модель Product для связи
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany; // Важно для определения отношений
 
 class User extends Authenticatable
 {
@@ -13,6 +15,8 @@ class User extends Authenticatable
 
     /**
      * Атрибуты, которые можно массово назначать.
+     *
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
@@ -22,6 +26,8 @@ class User extends Authenticatable
 
     /**
      * Атрибуты, которые должны быть скрыты при сериализации.
+     *
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -30,6 +36,8 @@ class User extends Authenticatable
 
     /**
      * Атрибуты, которые должны быть преобразованы.
+     *
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -39,17 +47,29 @@ class User extends Authenticatable
         ];
     }
 
-    // --- НАЧАЛО ВОССТАНОВЛЕННОГО КОДА ---
-
     /**
-     * Определяет отношение "многие-ко-многим" с моделью Product.
+     * Определяет отношение "многие-ко-многим" для избранных товаров.
      * Этот метод позволяет получать все товары, которые пользователь добавил в "Избранное".
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function favorites()
+    public function favorites(): BelongsToMany
     {
-        // Указываем, что User связан с Product через таблицу 'favorite_product'
+        // Указываем, что User связан с Product через сводную таблицу 'favorite_product'
         return $this->belongsToMany(Product::class, 'favorite_product');
     }
 
-    // --- КОНЕЦ ВОССТАНОВЛЕННОГО КОДА ---
+    /**
+     * +++ НОВЫЙ МЕТОД +++
+     *
+     * Определяет отношение "многие-ко-многим" для товаров в сравнении.
+     * Этот метод позволяет получать все товары, которые пользователь добавил для сравнения.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function compares(): BelongsToMany
+    {
+        // Указываем, что User связан с Product через сводную таблицу 'compare_product'
+        return $this->belongsToMany(Product::class, 'compare_product');
+    }
 }

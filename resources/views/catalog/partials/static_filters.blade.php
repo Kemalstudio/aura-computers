@@ -1,77 +1,71 @@
-{{-- resources/views/catalog/partials/static_filters.blade.php --}}
+@php $isAnyStaticFilterRendered = false; @endphp
 
 @if(isset($availableBrands) && $availableBrands->count() > 0)
-@php
-$isBrandFilterApplied = isset($selectedBrandSlugs) && count($selectedBrandSlugs) > 0;
-// Сортируем бренды по имени для корректной группировки
-$sortedBrands = $availableBrands->sortBy('name');
-@endphp
-<div class="filter-section mb-3 card">
-    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapseBrandsFilter" aria-expanded="{{ $isBrandFilterApplied ? 'true' : 'false' }}" aria-controls="collapseBrandsFilter">
-        <span>Бренд</span>
-        <i class="bi {{ $isBrandFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
-    </h6>
-    <div class="collapse {{ $isBrandFilterApplied ? 'show' : '' }}" id="collapseBrandsFilter">
-        <div class="card-body filter-section-body">
-            {{-- Поле для поиска брендов --}}
-            <div class="mb-3">
-                <input type="text" id="brand-search-input" class="form-control form-control-sm" placeholder="Поиск бренда...">
-            </div>
-
-            <div id="brands-list">
-                @php $currentLetter = ''; @endphp
-                @foreach($sortedBrands as $brand)
-                @php
-                // Получаем первую букву бренда в верхнем регистре
-                $firstLetter = mb_strtoupper(mb_substr($brand->name, 0, 1));
-                @endphp
-
-                {{-- Если первая буква изменилась, добавляем разделитель (кроме самого первого элемента) --}}
-                @if ($firstLetter !== $currentLetter && $currentLetter !== '')
-                <hr class="my-2 brand-separator">
-                @endif
-
-                <div class="form-check brand-item">
-                    <input class="form-check-input filter-input" type="checkbox" name="brands[]" value="{{ $brand->slug }}" id="brand-filter-{{ $brand->slug }}" @if(isset($selectedBrandSlugs) && in_array($brand->slug, $selectedBrandSlugs)) checked @endif>
-                    <label class="form-check-label" for="brand-filter-{{ $brand->slug }}">{{ $brand->name }}</label>
+    @php
+    $isBrandFilterApplied = isset($selectedBrandSlugs) && count($selectedBrandSlugs) > 0;
+    $sortedBrands = $availableBrands->sortBy('name');
+    @endphp
+    <div class="filter-section">
+        <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold @if($isAnyStaticFilterRendered) border-top mt-3 @endif" role="button" data-bs-toggle="collapse" data-bs-target="#collapseBrandsFilter" aria-expanded="{{ $isBrandFilterApplied ? 'true' : 'false' }}" aria-controls="collapseBrandsFilter">
+            <span>Бренд</span>
+            <i class="bi {{ $isBrandFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
+        </h6>
+        <div class="collapse {{ $isBrandFilterApplied ? 'show' : '' }}" id="collapseBrandsFilter">
+            <div class="card-body filter-section-body">
+                <div class="mb-3">
+                    <input type="text" id="brand-search-input" class="form-control form-control-sm" placeholder="Поиск бренда...">
                 </div>
-
-                @php
-                // Обновляем текущую букву
-                $currentLetter = $firstLetter;
-                @endphp
-                @endforeach
+                <div id="brands-list">
+                    @php $currentLetter = ''; @endphp
+                    @foreach($sortedBrands as $brand)
+                        @php
+                        $firstLetter = mb_strtoupper(mb_substr($brand->name, 0, 1));
+                        @endphp
+                        @if ($firstLetter !== $currentLetter && $currentLetter !== '')
+                        <hr class="my-2 brand-separator">
+                        @endif
+                        <div class="form-check brand-item">
+                            <input class="form-check-input filter-input" type="checkbox" name="brands[]" value="{{ $brand->slug }}" id="brand-filter-{{ $brand->slug }}" @if(isset($selectedBrandSlugs) && in_array($brand->slug, $selectedBrandSlugs)) checked @endif>
+                            <label class="form-check-label" for="brand-filter-{{ $brand->slug }}">{{ $brand->name }}</label>
+                        </div>
+                        @php
+                        $currentLetter = $firstLetter;
+                        @endphp
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>
-</div>
+    @php $isAnyStaticFilterRendered = true; @endphp
 @endif
 
 @if(isset($overallMinPrice) && isset($overallMaxPrice) && $overallMaxPrice > $overallMinPrice)
-@php $isPriceFilterApplied = (request('min_price') !== null && request('min_price') != ($overallMinPrice ?? 0)) || (request('max_price') !== null && ($overallMaxPrice === null || request('max_price') != ($overallMaxPrice ?? 0))); @endphp
-<div class="filter-section mb-3 card">
-    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapsePriceFilter" aria-expanded="{{ $isPriceFilterApplied ? 'true' : 'false' }}" aria-controls="collapsePriceFilter">
-        <span>Цена, TMT</span> <i class="bi {{ $isPriceFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
-    </h6>
-    <div class="collapse {{ $isPriceFilterApplied ? 'show' : '' }}" id="collapsePriceFilter">
-        <div class="card-body filter-section-body">
-            <div class="d-flex align-items-center mb-2">
-                <input type="number" class="form-control form-control-sm text-center filter-input" name="min_price" id="min_price_filter" placeholder="{{ number_format($overallMinPrice ?? 0, 0, '.', '') }}" value="{{ request('min_price', '') }}" min="{{ $overallMinPrice ?? 0 }}" max="{{ $overallMaxPrice ?? 1000 }}" aria-label="Минимальная цена">
-                <span class="mx-2 text-muted">–</span>
-                <input type="number" class="form-control form-control-sm text-center filter-input" name="max_price" id="max_price_filter" placeholder="{{ number_format($overallMaxPrice ?? 1000, 0, '.', '') }}" value="{{ request('max_price', '') }}" min="{{ $overallMinPrice ?? 0 }}" max="{{ $overallMaxPrice ?? 1000 }}" aria-label="Максимальная цена">
+    @php $isPriceFilterApplied = (request('min_price') !== null && request('min_price') != ($overallMinPrice ?? 0)) || (request('max_price') !== null && ($overallMaxPrice === null || request('max_price') != ($overallMaxPrice ?? 0))); @endphp
+    <div class="filter-section">
+        <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold @if($isAnyStaticFilterRendered) border-top mt-3 @endif" role="button" data-bs-toggle="collapse" data-bs-target="#collapsePriceFilter" aria-expanded="{{ $isPriceFilterApplied ? 'true' : 'false' }}" aria-controls="collapsePriceFilter">
+            <span>Цена, TMT</span> 
+            <i class="bi {{ $isPriceFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
+        </h6>
+        <div class="collapse {{ $isPriceFilterApplied ? 'show' : '' }}" id="collapsePriceFilter">
+            <div class="card-body filter-section-body">
+                <div class="d-flex align-items-center mb-2">
+                    <input type="number" class="form-control form-control-sm text-center filter-input" name="min_price" id="min_price_filter" placeholder="{{ number_format($overallMinPrice ?? 0, 0, '.', '') }}" value="{{ request('min_price', '') }}" min="{{ $overallMinPrice ?? 0 }}" max="{{ $overallMaxPrice ?? 1000 }}" aria-label="Минимальная цена">
+                    <span class="mx-2 text-muted">–</span>
+                    <input type="number" class="form-control form-control-sm text-center filter-input" name="max_price" id="max_price_filter" placeholder="{{ number_format($overallMaxPrice ?? 1000, 0, '.', '') }}" value="{{ request('max_price', '') }}" min="{{ $overallMinPrice ?? 0 }}" max="{{ $overallMaxPrice ?? 1000 }}" aria-label="Максимальная цена">
+                </div>
+                <div id="price-slider" class="mt-1"></div>
             </div>
-            <div id="price-slider" class="mt-1"></div>
         </div>
     </div>
-</div>
+    @php $isAnyStaticFilterRendered = true; @endphp
 @endif
 
 @php
 $selectedAvailability = (array) request('availability', []);
 $isFeaturesFilterApplied = request('is_new') == '1' || !empty($selectedAvailability);
 @endphp
-<div class="filter-section mb-3 card">
-    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold" role="button" data-bs-toggle="collapse" data-bs-target="#collapseFeaturesFilter" aria-expanded="{{ $isFeaturesFilterApplied ? 'true' : 'false' }}" aria-controls="collapseFeaturesFilter">
+<div class="filter-section">
+    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold @if($isAnyStaticFilterRendered) border-top mt-3 @endif" role="button" data-bs-toggle="collapse" data-bs-target="#collapseFeaturesFilter" aria-expanded="{{ $isFeaturesFilterApplied ? 'true' : 'false' }}" aria-controls="collapseFeaturesFilter">
         <span>Особенности</span> <i class="bi {{ $isFeaturesFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
     </h6>
     <div class="collapse {{ $isFeaturesFilterApplied ? 'show' : '' }}" id="collapseFeaturesFilter">

@@ -7,26 +7,20 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Запустить миграции.
+     * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('favorite_product', function (Blueprint $table) {
-            $table->id();
-
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            
+            $table->primary(['user_id', 'product_id']);
             $table->timestamps();
-
-            // Уникальный ключ, чтобы один и тот же товар нельзя было добавить в избранное дважды
-            $table->unique(['user_id', 'product_id']);
         });
     }
 
     /**
-     * Откатить миграции.
+     * Reverse the migrations.
      */
     public function down(): void
     {
