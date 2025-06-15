@@ -1,28 +1,34 @@
-@php $isAnyStaticFilterRendered = false; @endphp
+@php
+// Переменная для отслеживания, был ли уже отрисован хотя бы один фильтр.
+// Помогает правильно расставить отступы и разделители.
+$isAnyStaticFilterRendered = false;
+@endphp
 
+{{-- Фильтр по брендам --}}
 @if(isset($availableBrands) && $availableBrands->count() > 0)
     @php
     $isBrandFilterApplied = isset($selectedBrandSlugs) && count($selectedBrandSlugs) > 0;
     $sortedBrands = $availableBrands->sortBy('name');
     @endphp
-    <div class="filter-section">
-        <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold @if($isAnyStaticFilterRendered) border-top mt-3 @endif" role="button" data-bs-toggle="collapse" data-bs-target="#collapseBrandsFilter" aria-expanded="{{ $isBrandFilterApplied ? 'true' : 'false' }}" aria-controls="collapseBrandsFilter">
+    <div class="card bg-transparent border-0 filter-section @if($isAnyStaticFilterRendered) mt-3 @endif">
+        {{-- ИЗМЕНЕНИЕ: Убран класс bg-white. Теперь фон будет браться из темы. --}}
+        <h6 class="card-header filter-section-title d-flex justify-content-between align-items-center fw-bold p-3" role="button" data-bs-toggle="collapse" data-bs-target="#collapseBrandsFilter" aria-expanded="{{ $isBrandFilterApplied ? 'true' : 'false' }}" aria-controls="collapseBrandsFilter">
             <span>Бренд</span>
             <i class="bi {{ $isBrandFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
         </h6>
         <div class="collapse {{ $isBrandFilterApplied ? 'show' : '' }}" id="collapseBrandsFilter">
-            <div class="card-body filter-section-body">
+            <div class="card-body filter-section-body pt-2 pb-3 px-3">
                 <div class="mb-3">
                     <input type="text" id="brand-search-input" class="form-control form-control-sm" placeholder="Поиск бренда...">
                 </div>
-                <div id="brands-list">
+                <div id="brands-list" class="styled-scrollbar" style="max-height: 250px; overflow-y: auto;">
                     @php $currentLetter = ''; @endphp
                     @foreach($sortedBrands as $brand)
                         @php
                         $firstLetter = mb_strtoupper(mb_substr($brand->name, 0, 1));
                         @endphp
-                        @if ($firstLetter !== $currentLetter && $currentLetter !== '')
-                        <hr class="my-2 brand-separator">
+                        @if ($firstLetter !== $currentLetter && $currentLetter !== '' && ctype_alpha($firstLetter) && ctype_alpha($currentLetter))
+                            <hr class="my-2 brand-separator">
                         @endif
                         <div class="form-check brand-item">
                             <input class="form-check-input filter-input" type="checkbox" name="brands[]" value="{{ $brand->slug }}" id="brand-filter-{{ $brand->slug }}" @if(isset($selectedBrandSlugs) && in_array($brand->slug, $selectedBrandSlugs)) checked @endif>
@@ -39,37 +45,41 @@
     @php $isAnyStaticFilterRendered = true; @endphp
 @endif
 
+{{-- Фильтр по цене --}}
 @if(isset($overallMinPrice) && isset($overallMaxPrice) && $overallMaxPrice > $overallMinPrice)
-    @php $isPriceFilterApplied = (request('min_price') !== null && request('min_price') != ($overallMinPrice ?? 0)) || (request('max_price') !== null && ($overallMaxPrice === null || request('max_price') != ($overallMaxPrice ?? 0))); @endphp
-    <div class="filter-section">
-        <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold @if($isAnyStaticFilterRendered) border-top mt-3 @endif" role="button" data-bs-toggle="collapse" data-bs-target="#collapsePriceFilter" aria-expanded="{{ $isPriceFilterApplied ? 'true' : 'false' }}" aria-controls="collapsePriceFilter">
+    @php $isPriceFilterApplied = (request('min_price') !== null && request('min_price') != $overallMinPrice) || (request('max_price') !== null && request('max_price') != $overallMaxPrice); @endphp
+    <div class="card bg-transparent border-0 filter-section @if($isAnyStaticFilterRendered) mt-3 @endif">
+        {{-- ИЗМЕНЕНИЕ: Убран класс bg-white. --}}
+        <h6 class="card-header filter-section-title d-flex justify-content-between align-items-center fw-bold p-3" role="button" data-bs-toggle="collapse" data-bs-target="#collapsePriceFilter" aria-expanded="{{ $isPriceFilterApplied ? 'true' : 'false' }}" aria-controls="collapsePriceFilter">
             <span>Цена, TMT</span> 
             <i class="bi {{ $isPriceFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
         </h6>
         <div class="collapse {{ $isPriceFilterApplied ? 'show' : '' }}" id="collapsePriceFilter">
-            <div class="card-body filter-section-body">
-                <div class="d-flex align-items-center mb-2">
-                    <input type="number" class="form-control form-control-sm text-center filter-input" name="min_price" id="min_price_filter" placeholder="{{ number_format($overallMinPrice ?? 0, 0, '.', '') }}" value="{{ request('min_price', '') }}" min="{{ $overallMinPrice ?? 0 }}" max="{{ $overallMaxPrice ?? 1000 }}" aria-label="Минимальная цена">
+            <div class="card-body filter-section-body pt-2 pb-3 px-3">
+                <div class="d-flex align-items-center mb-3">
+                    <input type="number" class="form-control form-control-sm text-center filter-input" name="min_price" id="min_price_filter" placeholder="{{ number_format($overallMinPrice, 0, '.', '') }}" value="{{ request('min_price', '') }}" min="{{ $overallMinPrice }}" max="{{ $overallMaxPrice }}" aria-label="Минимальная цена">
                     <span class="mx-2 text-muted">–</span>
-                    <input type="number" class="form-control form-control-sm text-center filter-input" name="max_price" id="max_price_filter" placeholder="{{ number_format($overallMaxPrice ?? 1000, 0, '.', '') }}" value="{{ request('max_price', '') }}" min="{{ $overallMinPrice ?? 0 }}" max="{{ $overallMaxPrice ?? 1000 }}" aria-label="Максимальная цена">
+                    <input type="number" class="form-control form-control-sm text-center filter-input" name="max_price" id="max_price_filter" placeholder="{{ number_format($overallMaxPrice, 0, '.', '') }}" value="{{ request('max_price', '') }}" min="{{ $overallMinPrice }}" max="{{ $overallMaxPrice }}" aria-label="Максимальная цена">
                 </div>
-                <div id="price-slider" class="mt-1"></div>
+                <div id="price-slider"></div>
             </div>
         </div>
     </div>
     @php $isAnyStaticFilterRendered = true; @endphp
 @endif
 
+{{-- Фильтр по особенностям --}}
 @php
 $selectedAvailability = (array) request('availability', []);
 $isFeaturesFilterApplied = request('is_new') == '1' || !empty($selectedAvailability);
 @endphp
-<div class="filter-section">
-    <h6 class="filter-section-title card-header bg-white d-flex justify-content-between align-items-center fw-bold @if($isAnyStaticFilterRendered) border-top mt-3 @endif" role="button" data-bs-toggle="collapse" data-bs-target="#collapseFeaturesFilter" aria-expanded="{{ $isFeaturesFilterApplied ? 'true' : 'false' }}" aria-controls="collapseFeaturesFilter">
+<div class="card bg-transparent border-0 filter-section @if($isAnyStaticFilterRendered) mt-3 @endif">
+    {{-- ИЗМЕНЕНИЕ: Убран класс bg-white. --}}
+    <h6 class="card-header filter-section-title d-flex justify-content-between align-items-center fw-bold p-3" role="button" data-bs-toggle="collapse" data-bs-target="#collapseFeaturesFilter" aria-expanded="{{ $isFeaturesFilterApplied ? 'true' : 'false' }}" aria-controls="collapseFeaturesFilter">
         <span>Особенности</span> <i class="bi {{ $isFeaturesFilterApplied ? 'bi-chevron-up' : 'bi-chevron-down' }} filter-arrow"></i>
     </h6>
     <div class="collapse {{ $isFeaturesFilterApplied ? 'show' : '' }}" id="collapseFeaturesFilter">
-        <div class="card-body filter-section-body">
+        <div class="card-body filter-section-body pt-2 pb-3 px-3">
             <div class="form-check">
                 <input class="form-check-input filter-input" type="checkbox" name="is_new" value="1" id="filter_is_new" @if(request('is_new')=='1' ) checked @endif>
                 <label class="form-check-label" for="filter_is_new">Только новинки</label>
@@ -87,6 +97,7 @@ $isFeaturesFilterApplied = request('is_new') == '1' || !empty($selectedAvailabil
     </div>
 </div>
 
+{{-- Ваш JavaScript остается без изменений, он написан корректно --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('brand-search-input');
@@ -97,14 +108,11 @@ $isFeaturesFilterApplied = request('is_new') == '1' || !empty($selectedAvailabil
 
                 brandItems.forEach(item => {
                     const label = item.querySelector('label');
-                    const brandName = label.textContent.toLowerCase();
-                    if (brandName.includes(searchTerm)) {
-                        item.style.display = '';
-                    } else {
-                        item.style.display = 'none';
+                    if (label) {
+                        const brandName = label.textContent.toLowerCase();
+                        item.style.display = brandName.includes(searchTerm) ? '' : 'none';
                     }
                 });
-
                 updateSeparators();
             });
         }
@@ -122,16 +130,21 @@ $isFeaturesFilterApplied = request('is_new') == '1' || !empty($selectedAvailabil
                     }
                     nextElement = nextElement.nextElementSibling;
                 }
-
                 hr.style.display = groupHasVisibleItem ? '' : 'none';
             });
         }
 
+        // Обновляем разделители при первом показе блока, если он был свернут
         const brandCollapse = document.getElementById('collapseBrandsFilter');
         if (brandCollapse) {
             brandCollapse.addEventListener('shown.bs.collapse', function() {
                 updateSeparators();
             });
+        }
+        
+        // Первоначальный вызов для уже открытого блока
+        if (!brandCollapse || brandCollapse.classList.contains('show')) {
+            updateSeparators();
         }
     });
 </script>

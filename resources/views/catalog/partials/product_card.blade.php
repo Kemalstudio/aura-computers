@@ -53,9 +53,11 @@
             <p class="fw-bold fs-5 mb-0 text-primary product-price">
                 {{ number_format($product->price ?? 0, 0, ',', ' ') }} <small class="text-muted" style="font-size:0.7em; font-weight:normal;">TMT</small>
             </p>
-            <button class="btn btn-sm btn-primary rounded-pill px-3 add-to-cart-btn" aria-label="Добавить в корзину {{ $product->name }}">
-                <i class="bi bi-cart-plus"></i>
-                <span class="d-none d-sm-inline">В корзину</span>
+            <button class="btn btn-sm btn-primary rounded-pill px-3 add-to-cart-btn"
+                data-product-id="{{ $product->id }}"
+                aria-label="Добавить в корзину {{ $product->name }}">
+                <span class="btn-icon"><i class="bi bi-cart-plus"></i></span>
+                <span class="btn-text d-none d-sm-inline ms-1">В корзину</span>
             </button>
         </div>
     </div>
@@ -219,7 +221,6 @@
 
     .product-action-favorite.is-favorite .bi-heart::before {
         content: "\f415";
-        /* Код иконки bi-heart-fill */
         font-weight: bold;
     }
 </style>

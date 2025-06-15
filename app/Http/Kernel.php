@@ -23,15 +23,17 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            // Add your new middleware right here
-            \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\SetLocale::class, // <-- ВАШ MIDDLEWARE НА ПРАВИЛЬНОМ МЕСТЕ
         ],
         'api' => [
-            'throttle:api',
+            // 'throttle:api', // В Laravel 11+ это псевдоним
+            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
 
+    // В Laravel 11+ middlewareAliases переименован в $middlewareAliases
+    // и управляется через bootstrap/app.php. Для совместимости оставим так.
     protected $middlewareAliases = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,

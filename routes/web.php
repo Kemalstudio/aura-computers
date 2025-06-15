@@ -9,40 +9,29 @@ use App\Http\Controllers\FavoritesController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\StoreReviewController;
-use App\Http\Controllers\LocaleController; // Рекомендуется для логики языка
+use App\Http\Controllers\LocaleController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-| Маршруты сгруппированы для лучшей читаемости и поддержки.
 */
 
-// --- 1. ПУБЛИЧНЫЕ МАРШРУТЫ (Доступны всем) ---
+// --- 1. ПУБЛИЧНЫЕ МАРШРУТЫ ---
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/catalog', [ProductController::class, 'index'])->name('catalog.index');
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
-// Маршрут для переключения языка
-// routes/web.php
-
 Route::get('locale/{locale}', function ($locale) {
-    // Check if the selected locale is in our list of available locales
     if (in_array($locale, config('app.available_locales', ['en', 'ru', 'tm']))) {
-        // If it is, put it in the session
         session()->put('locale', $locale);
     }
-    // Redirect the user back to the previous page
     return redirect()->back();
 })->name('locale.switch');
 
-// API-поиск для модального окна отзывов
 Route::get('/api/products/search', [ProductController::class, 'search'])->name('api.products.search');
-
-// Публичный маршрут для отзывов о магазине
 Route::post('/store-reviews', [StoreReviewController::class, 'store'])->name('store-reviews.store');
-
 
 // --- 2. МАРШРУТЫ, ТРЕБУЮЩИЕ АУТЕНТИФИКАЦИИ ---
 
@@ -53,8 +42,14 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/dashboard', fn() => view('dashboard'))->name('dashboard');
 
-    // Корзина
-    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    // Корзина (API-ориентированные маршруты)
+    Route::prefix('cart')->name('cart.')->group(function () {
+        // ИСПРАВЛЕНО ЗДЕСЬ: getCartContent -> index
+        Route::get('/', [CartController::class, 'index'])->name('index'); 
+        Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
+        Route::post('/update/{rowId}', [CartController::class, 'update'])->name('update');
+        Route::delete('/remove/{rowId}', [CartController::class, 'remove'])->name('remove');
+    });
 
     // Избранное
     Route::get('/favorites', [FavoritesController::class, 'index'])->name('favorites.index');
@@ -65,10 +60,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/compare/toggle/{product}', [CompareController::class, 'toggle'])->name('compare.toggle');
     Route::post('/compare/clear', [CompareController::class, 'clear'])->name('compare.clear');
 
-    // Отзывы о товарах (единый правильный маршрут)
+    // Отзывы о товарах
     Route::post('/products/{product}/reviews', [ProductReviewController::class, 'store'])->name('products.reviews.store');
 });
-
 
 // --- 3. СИСТЕМНЫЕ МАРШРУТЫ ---
 
